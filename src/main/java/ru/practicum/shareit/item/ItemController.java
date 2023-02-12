@@ -1,8 +1,10 @@
 package ru.practicum.shareit.item;
 
-import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.service.ItemService;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
@@ -12,30 +14,37 @@ import java.util.Collection;
  */
 @RestController
 @RequestMapping("/items")
+@RequiredArgsConstructor
 public class ItemController {
+    private final ItemService itemService;
     private final String pathId = "/{id}";
 
     @GetMapping()
-    public Collection<ItemDto> getItems() {
-        return null;
+    public Collection<ItemDto> getItems(@RequestHeader(value = "X-Sharer-User-Id") Integer ownerId) {
+        return itemService.getItems(ownerId);
     }
 
+    @GetMapping(pathId)
+    public ItemDto getItem(@PathVariable Integer id) {
+        return itemService.getItem(id);
+    }
+
+    @GetMapping("/search")
+    public Collection<ItemDto> getItems(@RequestParam(name = "text") String text) {
+        return itemService.getItems(text);
+    }
 
     @PostMapping()
-    public ItemDto create(@Valid @RequestBody ItemDto item) {
-        return null;
+    public ItemDto create(@RequestHeader(value = "X-Sharer-User-Id") Integer ownerId,
+                          @Valid @RequestBody @NotNull ItemDto item) {
+        return itemService.addItem(ownerId, item);
     }
 
-
-    @PutMapping()
-    public ResponseEntity<ItemDto> update(@Valid @RequestBody @NotNull ItemDto item) {
-        return null;
-    }
-
-
-    @DeleteMapping(pathId)
-    public ResponseEntity<ItemDto> deleteItem(@PathVariable int id) {
-        return null;
+    @PatchMapping(pathId)
+    public ItemDto update(@RequestHeader(value = "X-Sharer-User-Id") Integer ownerId,
+                          @PathVariable Integer id,
+                          @Valid @RequestBody @NotNull ItemDto item) {
+        return itemService.update(ownerId, id, item);
     }
 
 }

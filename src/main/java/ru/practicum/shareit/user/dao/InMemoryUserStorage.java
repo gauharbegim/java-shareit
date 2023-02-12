@@ -1,13 +1,11 @@
 package ru.practicum.shareit.user.dao;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Slf4j
 @Repository
 public class InMemoryUserStorage implements UserStorage {
 
@@ -18,7 +16,6 @@ public class InMemoryUserStorage implements UserStorage {
     public Map<Integer, User> getUsers() {
         return users;
     }
-
 
     @Override
     public boolean isEmailExists(String email) {
@@ -61,7 +58,6 @@ public class InMemoryUserStorage implements UserStorage {
         if (users.containsKey(id)) {
             User existsUser = users.get(id);
 
-            log.info(user.getEmail());
             if (user.getEmail() != null) {
                 existsUser.setEmail(user.getEmail());
             }

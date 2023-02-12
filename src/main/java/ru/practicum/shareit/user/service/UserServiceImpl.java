@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dao.UserStorage;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.exceptions.IncorrectParameterException;
+import ru.practicum.shareit.user.exceptions.IncorrectUserParameterException;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService{
             User newUser = userStorage.addUser(user);
             return UserMapper.toUserDto(newUser);
         }else{
-            throw new IncorrectParameterException("Такой email уже существует");
+            throw new IncorrectUserParameterException("Такой email уже существует");
         }
     }
 
@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService{
             User newUser = userStorage.getUserById(id);
             return UserMapper.toUserDto(newUser);
         }else{
-            throw new IncorrectParameterException("Такой email уже существует");
+            throw new IncorrectUserParameterException("Такой email уже существует");
         }
     }
 
@@ -51,8 +51,12 @@ public class UserServiceImpl implements UserService{
         return UserMapper.toUserDtoCollection(userStorage.getUsers());
     }
 
-    public UserDto getUserById(Integer id) {
+    public UserDto getUser(Integer id) {
         User user = userStorage.getUserById(id);
-        return UserMapper.toUserDto(user);
+        if (user!=null) {
+            return UserMapper.toUserDto(user);
+        }else{
+            throw new IncorrectUserParameterException("Пользователь не найден");
+        }
     }
 }
