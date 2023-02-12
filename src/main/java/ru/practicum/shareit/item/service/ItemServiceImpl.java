@@ -22,11 +22,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto addItem(Integer ownerId, ItemDto itemDto) {
         checkOwner(ownerId);
-        if (itemDto.getName() == null || itemDto.getName().isBlank()) {
+        if (itemDto.getName()==null || itemDto.getName().isBlank()) {
             throw new IncorrectItemParameterException("Название не может быть пустой");
-        } else if (itemDto.getDescription() == null || itemDto.getDescription().isBlank()) {
+        } else if (itemDto.getDescription()==null || itemDto.getDescription().isBlank()) {
             throw new IncorrectItemParameterException("Описание не может быть пустой");
-        } else if (itemDto.getAvailable() == null) {
+        } else if (itemDto.getAvailable()==null) {
             throw new IncorrectItemParameterException("Статус не может быть пустой");
         } else {
             Item item = ItemMapper.toItem(itemDto);
@@ -41,7 +41,7 @@ public class ItemServiceImpl implements ItemService {
         checkOwner(ownerId);
 
         Item oldItem = itemStorage.getItem(itemId);
-        if (oldItem.getOwner().getId() == ownerId) {
+        if (oldItem.getOwner().getId()==ownerId) {
             Item item = ItemMapper.toItem(itemDto);
             Item newItem = itemStorage.updateUser(ownerId, itemId, item);
             return ItemMapper.toItemDto(newItem);
@@ -69,7 +69,7 @@ public class ItemServiceImpl implements ItemService {
 
     private void checkOwner(Integer ownerId) {
         User user = userStorage.getUserById(ownerId);
-        if (user == null) {
+        if (user==null) {
             throw new IncorrectOwnerParameterException("Пользователь не найден");
         }
     }
