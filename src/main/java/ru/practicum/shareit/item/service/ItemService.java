@@ -9,7 +9,7 @@ public interface ItemService {
 
     ItemDto update(Integer ownerId, Integer itemId, ItemDto itemDto);
 
-    ItemDto getItem( Integer itemId);
+    ItemDto getItem(Integer itemId);
 
     Collection<ItemDto> getItems(Integer ownerId);
 
