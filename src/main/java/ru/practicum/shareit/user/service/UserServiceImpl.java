@@ -13,7 +13,7 @@ import java.util.Collection;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
 
     public UserDto addUser(UserDto userDto) {
@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService{
             User user = UserMapper.toUserModel(userDto);
             User newUser = userStorage.addUser(user);
             return UserMapper.toUserDto(newUser);
-        }else{
+        } else {
             throw new IncorrectUserParameterException("Такой email уже существует");
         }
     }
@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService{
 
             User newUser = userStorage.getUserById(id);
             return UserMapper.toUserDto(newUser);
-        }else{
+        } else {
             throw new IncorrectUserParameterException("Такой email уже существует");
         }
     }
@@ -53,9 +53,9 @@ public class UserServiceImpl implements UserService{
 
     public UserDto getUser(Integer id) {
         User user = userStorage.getUserById(id);
-        if (user!=null) {
+        if (user != null) {
             return UserMapper.toUserDto(user);
-        }else{
+        } else {
             throw new IncorrectUserParameterException("Пользователь не найден");
         }
     }
