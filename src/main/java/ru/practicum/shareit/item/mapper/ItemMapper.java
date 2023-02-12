@@ -26,9 +26,9 @@ public class ItemMapper {
                 null);
     }
 
-    public static Collection<ItemDto> toItemDtoCollection(Map<Integer, Item> itemMap){
+    public static Collection<ItemDto> toItemDtoCollection(Map<Integer, Item> itemMap) {
         Collection<ItemDto> newCollection = new ArrayList<>();
-        for (Item item : itemMap.values()){
+        for (Item item : itemMap.values()) {
             ItemDto itemDto = new ItemDto(
                     item.getId(),
                     item.getName(),

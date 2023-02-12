@@ -22,11 +22,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto addItem(Integer ownerId, ItemDto itemDto) {
         checkOwner(ownerId);
-        if (itemDto.getName()==null || itemDto.getName().isBlank()) {
+        if (itemDto.getName() == null || itemDto.getName().isBlank()) {
             throw new IncorrectItemParameterException("Название не может быть пустой");
-        } else if (itemDto.getDescription()==null || itemDto.getDescription().isBlank()) {
+        } else if (itemDto.getDescription() == null || itemDto.getDescription().isBlank()) {
             throw new IncorrectItemParameterException("Описание не может быть пустой");
-        } else if (itemDto.getAvailable()==null) {
+        } else if (itemDto.getAvailable() == null) {
             throw new IncorrectItemParameterException("Статус не может быть пустой");
         } else {
             Item item = ItemMapper.toItem(itemDto);
@@ -52,8 +52,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto getItem(Integer itemId) {
-            Item newItem = itemStorage.getItem(itemId);
-            return ItemMapper.toItemDto(newItem);
+        Item newItem = itemStorage.getItem(itemId);
+        return ItemMapper.toItemDto(newItem);
     }
 
     @Override
