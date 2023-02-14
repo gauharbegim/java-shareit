@@ -18,11 +18,11 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean isEmailExists(String email) {
-        boolean res = false;
+    public User getUserByEmail(String email) {
+        User res = null;
         for (User user : users.values()) {
             if (user.getEmail().equals(email)) {
-                res = true;
+                res = user;
             }
         }
         return res;

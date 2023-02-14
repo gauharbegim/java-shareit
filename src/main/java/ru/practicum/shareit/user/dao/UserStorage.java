@@ -8,7 +8,7 @@ public interface UserStorage {
 
     Map<Integer, User> getUsers();
 
-    boolean isEmailExists(String email);
+    User getUserByEmail(String email);
 
     User addUser(User user);
 

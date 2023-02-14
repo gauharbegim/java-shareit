@@ -17,8 +17,8 @@ public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
 
     public UserDto addUser(UserDto userDto) {
-        boolean isEmailExists = userStorage.isEmailExists(userDto.getEmail());
-        if (!isEmailExists) {
+        User userByEmail = userStorage.getUserByEmail(userDto.getEmail());
+        if (userByEmail!=null) {
             User user = UserMapper.toUserModel(userDto);
             User newUser = userStorage.addUser(user);
             return UserMapper.toUserDto(newUser);
@@ -35,8 +35,8 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserDto updateUser(Integer id, UserDto userDto) {
-        boolean isEmailExists = userStorage.isEmailExists(userDto.getEmail());
-        if (!isEmailExists) {
+        User userByEmail = userStorage.getUserByEmail(userDto.getEmail());
+    if (userByEmail!=null && !userByEmail.getId().equals(id)) {
             User user = UserMapper.toUserModel(userDto);
             userStorage.updateUser(id, user);
 
