@@ -18,7 +18,7 @@ public class UserServiceImpl implements UserService {
 
     public UserDto addUser(UserDto userDto) {
         User userByEmail = userStorage.getUserByEmail(userDto.getEmail());
-        if (userByEmail!=null) {
+        if (userByEmail==null) {
             User user = UserMapper.toUserModel(userDto);
             User newUser = userStorage.addUser(user);
             return UserMapper.toUserDto(newUser);
@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
 
     public UserDto updateUser(Integer id, UserDto userDto) {
         User userByEmail = userStorage.getUserByEmail(userDto.getEmail());
-    if (userByEmail!=null && !userByEmail.getId().equals(id)) {
+    if (userByEmail==null || userByEmail.getId().equals(id)) {
             User user = UserMapper.toUserModel(userDto);
             userStorage.updateUser(id, user);
 
