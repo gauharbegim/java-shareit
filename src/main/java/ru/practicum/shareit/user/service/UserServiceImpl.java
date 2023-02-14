@@ -16,33 +16,33 @@ import java.util.Collection;
 public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
 
-    public UserDto addUser(UserDto userDto) {
+    public UserDto addUser(UserDto userDto){
         boolean isEmailExists = userStorage.isEmailExists(userDto.getEmail());
-        if (!isEmailExists) {
+        if (!isEmailExists){
             User user = UserMapper.toUserModel(userDto);
             User newUser = userStorage.addUser(user);
             return UserMapper.toUserDto(newUser);
-        } else {
+        }else{
             throw new IncorrectUserParameterException("Такой email уже существует");
         }
     }
 
-    public void deleteUser(Integer userId) {
-        if (userId < 1) {
+    public void deleteUser(Integer userId){
+        if (userId < 1){
             throw new UserNotFoundException("Id пользователя должно быть больше 0");
         }
         userStorage.deleteUser(userId);
     }
 
-    public UserDto updateUser(Integer id, UserDto userDto) {
+    public UserDto updateUser(Integer id, UserDto userDto){
         boolean isEmailExists = userStorage.isEmailExists(userDto.getEmail());
-        if (!isEmailExists) {
+        if (!isEmailExists){
             User user = UserMapper.toUserModel(userDto);
             userStorage.updateUser(id, user);
 
             User newUser = userStorage.getUserById(id);
             return UserMapper.toUserDto(newUser);
-        } else {
+        }else{
             throw new IncorrectUserParameterException("Такой email уже существует");
         }
     }
@@ -51,11 +51,11 @@ public class UserServiceImpl implements UserService {
         return UserMapper.toUserDtoCollection(userStorage.getUsers());
     }
 
-    public UserDto getUser(Integer id) {
+    public UserDto getUser(Integer id){
         User user = userStorage.getUserById(id);
-        if (user != null) {
+        if (user != null){
             return UserMapper.toUserDto(user);
-        } else {
+        }else{
             throw new IncorrectUserParameterException("Пользователь не найден");
         }
     }
