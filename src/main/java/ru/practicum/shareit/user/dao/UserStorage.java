@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.dao;
 
 import ru.practicum.shareit.user.model.User;
+
 import java.util.Map;
 
 public interface UserStorage {
@@ -15,5 +16,5 @@ public interface UserStorage {
 
     void updateUser(Integer id, User user);
 
-    User getUserById(Integer id );
+    User getUserById(Integer id);
 }
