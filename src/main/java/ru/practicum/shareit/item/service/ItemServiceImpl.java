@@ -41,7 +41,7 @@ public class ItemServiceImpl implements ItemService {
         checkOwner(ownerId);
 
         Item oldItem = itemStorage.getItem(itemId);
-        if (oldItem.getOwner().getId() == ownerId) {
+        if (oldItem.getOwner().getId().equals(ownerId)) {
             Item item = ItemMapper.toItem(itemDto);
             Item newItem = itemStorage.updateUser(ownerId, itemId, item);
             return ItemMapper.toItemDto(newItem);
