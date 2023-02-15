@@ -6,9 +6,6 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.Date;
 
-/**
- * TODO Sprint add-bookings.
- */
 @Data
 public class BookingDto {
     private Date dateBegin;
