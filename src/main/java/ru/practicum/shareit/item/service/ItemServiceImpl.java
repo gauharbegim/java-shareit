@@ -11,7 +11,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserStorage;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.Collection;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -57,14 +57,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Collection<ItemDto> getItems(Integer ownerId) {
+    public List<ItemDto> getItems(Integer ownerId) {
         checkOwner(ownerId);
-        return ItemMapper.toItemDtoCollection(itemStorage.getItems(ownerId));
+        return ItemMapper.toItemDtoList(itemStorage.getItems(ownerId));
     }
 
     @Override
-    public Collection<ItemDto> getItems(String text) {
-        return ItemMapper.toItemDtoCollection(itemStorage.getItems(text));
+    public List<ItemDto> getItems(String text) {
+        return ItemMapper.toItemDtoList(itemStorage.getItems(text));
     }
 
     private void checkOwner(Integer ownerId) {

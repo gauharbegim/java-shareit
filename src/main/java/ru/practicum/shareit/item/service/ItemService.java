@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import ru.practicum.shareit.item.dto.ItemDto;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface ItemService {
     ItemDto addItem(Integer ownerId, ItemDto itemDto);
@@ -11,7 +11,7 @@ public interface ItemService {
 
     ItemDto getItem(Integer itemId);
 
-    Collection<ItemDto> getItems(Integer ownerId);
+    List<ItemDto> getItems(Integer ownerId);
 
-    Collection<ItemDto> getItems(String text);
+    List<ItemDto> getItems(String text);
 }

@@ -5,48 +5,33 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserStorage;
 import ru.practicum.shareit.user.model.User;
-
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ItemStorageImpl implements ItemStorage {
     private final UserStorage userStorage;
 
-    private HashMap<Integer, Item> items = new HashMap<>();
+    private Map<Integer, Item> items = new HashMap<>();
     private int counterId = 1;
 
 
     @Override
-    public Map<Integer, Item> getItems(Integer ownerId) {
-        Map<Integer, Item> res = new HashMap<>();
-
+    public List<Item> getItems(Integer ownerId) {
         User user = userStorage.getUserById(ownerId);
-
-        for (Item item : items.values()) {
-            if (item.getOwner().equals(user)) {
-                res.put(item.getId(), item);
-            }
-        }
-
-        return res;
+        return items.values().stream().filter(item -> item.getOwner().equals(user)).collect(Collectors.toList());
     }
 
     @Override
-    public Map<Integer, Item> getItems(String text) {
-        Map<Integer, Item> res = new HashMap<>();
-
-        for (Item item : items.values()) {
-            if (item.getIsAvailable()
-                    && !text.isBlank()
-                    && (item.getName().toLowerCase().contains(text.toLowerCase())
-                        || item.getDescription().toLowerCase().contains(text.toLowerCase()))) {
-                res.put(item.getId(), item);
-            }
-        }
-
-        return res;
+    public List<Item> getItems(String text) {
+        return items.values().stream().filter(item -> item.getIsAvailable()
+                && !text.isBlank()
+                && (item.getName().toLowerCase().contains(text.toLowerCase())
+                || item.getDescription().toLowerCase().contains(text.toLowerCase()))
+        ).collect(Collectors.toList());
     }
 
     @Override

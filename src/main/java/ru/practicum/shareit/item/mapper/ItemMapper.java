@@ -4,8 +4,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 public class ItemMapper {
 
@@ -17,14 +16,14 @@ public class ItemMapper {
         return new Item(null, itemDto.getName(), itemDto.getDescription(), itemDto.getAvailable(), itemDto.getRequestId(), null);
     }
 
-    public static Collection<ItemDto> toItemDtoCollection(Map<Integer, Item> itemMap) {
-        Collection<ItemDto> newCollection = new ArrayList<>();
-        for (Item item : itemMap.values()) {
+    public static List<ItemDto> toItemDtoList(List<Item> itemList) {
+        List<ItemDto> newList = new ArrayList<>();
+        for (Item item : itemList) {
             ItemDto itemDto = new ItemDto(item.getId(), item.getName(), item.getDescription(), item.getIsAvailable(), item.getRequestId());
 
-            newCollection.add(itemDto);
+            newList.add(itemDto);
         }
-        return newCollection;
+        return newList;
     }
 
 }

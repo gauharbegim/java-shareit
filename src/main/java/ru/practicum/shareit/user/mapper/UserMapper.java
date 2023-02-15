@@ -4,8 +4,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 public class UserMapper {
 
@@ -25,17 +24,17 @@ public class UserMapper {
         );
     }
 
-    public static Collection<UserDto> toUserDtoCollection(Map<Integer, User> userMap) {
-        Collection<UserDto> newCollection = new ArrayList<>();
-        for (User user : userMap.values()) {
+    public static List<UserDto> toUserDtoList(List<User> userList) {
+        List<UserDto> newList = new ArrayList<>();
+        for (User user : userList) {
             UserDto userDto = new UserDto(
                     user.getId(),
                     user.getName(),
                     user.getEmail()
             );
 
-            newCollection.add(userDto);
+            newList.add(userDto);
         }
-        return newCollection;
+        return newList;
     }
 }

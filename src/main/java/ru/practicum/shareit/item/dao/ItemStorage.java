@@ -2,12 +2,12 @@ package ru.practicum.shareit.item.dao;
 
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.Map;
+import java.util.List;
 
 public interface ItemStorage {
-    Map<Integer, Item> getItems(Integer ownerId);
+    List<Item> getItems(Integer ownerId);
 
-    Map<Integer, Item> getItems(String text);
+    List<Item> getItems(String text);
 
     Item getItem(Integer id);
 

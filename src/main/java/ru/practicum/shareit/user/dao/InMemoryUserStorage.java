@@ -3,7 +3,9 @@ package ru.practicum.shareit.user.dao;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -12,8 +14,8 @@ public class InMemoryUserStorage implements UserStorage {
     private int counterId = 1;
 
     @Override
-    public Map<Integer, User> getUsers() {
-        return users;
+    public List<User> getUsers() {
+        return new ArrayList<>(users.values());
     }
 
     @Override
@@ -29,12 +31,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User getUserById(Integer id) {
-        if (users.containsKey(id)) {
-            User existsUser = users.get(id);
-            return existsUser;
-        } else {
-            return null;
-        }
+        return users.getOrDefault(id, null);
     }
 
     @Override

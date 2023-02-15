@@ -7,7 +7,7 @@ import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -18,7 +18,7 @@ public class UserController {
 
 
     @GetMapping()
-    public Collection<UserDto> getUsers() {
+    public List<UserDto> getUsers() {
         return userService.getUsersList();
     }
 

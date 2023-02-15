@@ -2,11 +2,11 @@ package ru.practicum.shareit.user.dao;
 
 import ru.practicum.shareit.user.model.User;
 
-import java.util.Map;
+import java.util.List;
 
 public interface UserStorage {
 
-    Map<Integer, User> getUsers();
+    List<User> getUsers();
 
     User getUserByEmail(String email);
 

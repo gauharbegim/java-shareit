@@ -4,10 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.utilits.Variables;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/items")
@@ -17,7 +18,7 @@ public class ItemController {
     private final String pathId = "/{id}";
 
     @GetMapping()
-    public Collection<ItemDto> getItems(@RequestHeader(value = "X-Sharer-User-Id") Integer ownerId) {
+    public List<ItemDto> getItems(@RequestHeader(value = Variables.USER_ID) Integer ownerId) {
         return itemService.getItems(ownerId);
     }
 
@@ -27,18 +28,18 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public Collection<ItemDto> getItems(@RequestParam(name = "text") String text) {
+    public List<ItemDto> getItems(@RequestParam(name = "text") String text) {
         return itemService.getItems(text);
     }
 
     @PostMapping()
-    public ItemDto create(@RequestHeader(value = "X-Sharer-User-Id") Integer ownerId,
+    public ItemDto create(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
                           @Valid @RequestBody @NotNull ItemDto item) {
         return itemService.addItem(ownerId, item);
     }
 
     @PatchMapping(pathId)
-    public ItemDto update(@RequestHeader(value = "X-Sharer-User-Id") Integer ownerId,
+    public ItemDto update(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
                           @PathVariable Integer id,
                           @Valid @RequestBody @NotNull ItemDto item) {
         return itemService.update(ownerId, id, item);
