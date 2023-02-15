@@ -8,8 +8,7 @@ import java.util.Map;
 
 @Repository
 public class InMemoryUserStorage implements UserStorage {
-
-    private HashMap<Integer, User> users = new HashMap<>();
+    private Map<Integer, User> users = new HashMap<>();
     private int counterId = 1;
 
     @Override

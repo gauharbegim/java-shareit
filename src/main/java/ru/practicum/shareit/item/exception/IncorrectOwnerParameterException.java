@@ -1,13 +1,10 @@
 package ru.practicum.shareit.item.exception;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Getter
 public class IncorrectOwnerParameterException extends RuntimeException {
     private final String parameter;
-
-    public IncorrectOwnerParameterException(String parameter) {
-        this.parameter = parameter;
-    }
-
-    public String getParameter() {
-        return parameter;
-    }
 }
