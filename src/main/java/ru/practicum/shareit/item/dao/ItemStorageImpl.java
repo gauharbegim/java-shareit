@@ -39,8 +39,7 @@ public class ItemStorageImpl implements ItemStorage {
 
     @Override
     public Item getItem(Integer id) {
-        Item item = items.get(id);
-        return item;
+        return items.get(id);
     }
 
     @Override
