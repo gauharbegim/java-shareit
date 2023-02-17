@@ -27,7 +27,8 @@ public class ItemStorageImpl implements ItemStorage {
 
     @Override
     public List<Item> getItems(String text) {
-        return items.values().stream().filter(item -> item.getIsAvailable()
+        return items.values().stream()
+            .filter(item -> item.getIsAvailable()
                 && !text.isBlank()
                 && (item.getName().toLowerCase().contains(text.toLowerCase())
                 || item.getDescription().toLowerCase().contains(text.toLowerCase()))
