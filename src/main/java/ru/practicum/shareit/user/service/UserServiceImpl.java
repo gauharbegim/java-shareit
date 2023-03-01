@@ -2,7 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.user.dao.UserStorage;
+import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.exceptions.IncorrectUserParameterException;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
@@ -10,37 +10,46 @@ import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserStorage userStorage;
+    //    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
     public UserDto addUser(UserDto userDto) {
-        User userByEmail = userStorage.getUserByEmail(userDto.getEmail());
-        if (userByEmail == null) {
-            User user = UserMapper.toUserModel(userDto);
-            User newUser = userStorage.addUser(user);
-            return UserMapper.toUserDto(newUser);
-        } else {
-            throw new IncorrectUserParameterException("Такой email уже существует");
-        }
+        User user = UserMapper.toUserModel(userDto);
+        User newUser = userRepository.save(user);
+        return UserMapper.toUserDto(newUser);
     }
 
     public void deleteUser(Integer userId) {
         if (userId < 1) {
             throw new UserNotFoundException("Id пользователя должно быть больше 0");
         }
-        userStorage.deleteUser(userId);
+        userRepository.deleteById(userId);
     }
 
     public UserDto updateUser(Integer id, UserDto userDto) {
-        User userByEmail = userStorage.getUserByEmail(userDto.getEmail());
-        if (userByEmail == null || userByEmail.getId().equals(id)) {
-            User user = UserMapper.toUserModel(userDto);
-            userStorage.updateUser(id, user);
+        User userByEmail = null;
 
-            User newUser = userStorage.getUserById(id);
+        if (userDto.getEmail() != null) {
+            userByEmail = userRepository.findByEmail(userDto.getEmail());
+        }
+
+        if (userByEmail == null || userByEmail.getId().equals(id)) {
+            User user = userRepository.findById(id).get();
+            if (userDto.getName() != null) {
+                user.setName(userDto.getName());
+            }
+
+            if (userDto.getEmail() != null) {
+                user.setEmail(userDto.getEmail());
+            }
+            userRepository.save(user);
+
+            User newUser = userRepository.findById(id).get();
             return UserMapper.toUserDto(newUser);
         } else {
             throw new IncorrectUserParameterException("Такой email уже существует");
@@ -48,15 +57,15 @@ public class UserServiceImpl implements UserService {
     }
 
     public List<UserDto> getUsersList() {
-        return UserMapper.toUserDtoList(userStorage.getUsers());
+        return UserMapper.toUserDtoList(userRepository.findAll());
     }
 
     public UserDto getUser(Integer id) {
-        User user = userStorage.getUserById(id);
-        if (user != null) {
-            return UserMapper.toUserDto(user);
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            return UserMapper.toUserDto(user.get());
         } else {
-            throw new IncorrectUserParameterException("Пользователь не найден");
+            throw new UserNotFoundException("Пользователь не найден");
         }
     }
 }

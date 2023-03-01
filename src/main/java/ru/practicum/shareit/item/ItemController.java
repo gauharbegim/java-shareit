@@ -13,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
+
 public class ItemController {
     private final ItemService itemService;
     private final String pathId = "/{id}";
@@ -23,12 +24,14 @@ public class ItemController {
     }
 
     @GetMapping(pathId)
-    public ItemDto getItem(@PathVariable Integer id) {
-        return itemService.getItem(id);
+    public ItemDto getItem(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
+                           @PathVariable Integer id) {
+        return itemService.getItem(ownerId, id);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getItems(@RequestParam(name = "text") String text) {
+    public List<ItemDto> getItems(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
+                                  @RequestParam(name = "text") String text) {
         return itemService.getItems(text);
     }
 

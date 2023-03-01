@@ -11,8 +11,8 @@ public class UserMapper {
     public static User toUserModel(UserDto userDto) {
         return new User(
                 userDto.getId(),
-                userDto.getName(),
-                userDto.getEmail()
+                userDto.getEmail(),
+                userDto.getName()
         );
     }
 
