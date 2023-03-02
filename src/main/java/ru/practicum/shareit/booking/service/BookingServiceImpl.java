@@ -141,7 +141,7 @@ public class BookingServiceImpl implements BookingService {
             } else if (state.equals("PAST")) {
                 list = bookingList.stream()
                         .filter(booking -> booking.getDateBegin().before(new Date()))
-                        .filter(booking ->  booking.getDateEnd().before(new Date()))
+                        .filter(booking -> booking.getDateEnd().before(new Date()))
                         .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
             } else if (state.equals("FUTURE")) {
@@ -171,7 +171,7 @@ public class BookingServiceImpl implements BookingService {
                         bookingList.addAll(itemBookingList);
                     }
             );
-            log.info("--------------------------------------"+state+"----------------------------------------------------");
+            log.info("--------------------------------------" + state + "----------------------------------------------------");
             List<Booking> list = new ArrayList<>();
             if (state.equals("CURRENT")) {
                 log.info("*********1**********");
@@ -196,7 +196,7 @@ public class BookingServiceImpl implements BookingService {
                 log.info("*********4**********");
                 list = bookingList.stream()
                         .filter(booking -> booking.getDateBegin().before(new Date()))
-                        .filter(booking ->  booking.getDateEnd().before(new Date()))
+                        .filter(booking -> booking.getDateEnd().before(new Date()))
                         .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
             } else if (state.equals("FUTURE")) {
@@ -210,9 +210,9 @@ public class BookingServiceImpl implements BookingService {
                         .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
             }
-            log.info("---> bookingList: "+bookingList);
-            log.info("---> filtered list: "+list);
-            log.info("--------------------------------------"+state+"----------------------------------------------------");
+            log.info("---> bookingList: " + bookingList);
+            log.info("---> filtered list: " + list);
+            log.info("--------------------------------------" + state + "----------------------------------------------------");
             return BookingMapper.toBookingDtoList(list);
         } else {
             throw new UserNotFoundException("Пользователь не найден");

@@ -29,12 +29,12 @@ public class CommentServiceImpl implements CommentService {
     public ItemDto addComment(Integer authorId, Integer itemId, CommentDto commentDto) {
 
         Optional<User> authorOption = userRepository.findById(authorId);
-        if (!authorOption.isPresent()){
+        if (!authorOption.isPresent()) {
             throw new IncorrectParameterException("Пользователь не найден");
         }
-        
+
         ItemDto itemDto = itemService.getItem(authorId, itemId);
-        if (itemDto.getLastBooking()!=null){
+        if (itemDto.getLastBooking() != null) {
             Comment comment = new Comment();
             comment.setAuthor(authorOption.get());
             comment.setDateCreated(new Date());

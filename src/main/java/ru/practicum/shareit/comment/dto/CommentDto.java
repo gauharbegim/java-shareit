@@ -2,7 +2,6 @@ package ru.practicum.shareit.comment.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import ru.practicum.shareit.comment.mapper.AuthorMapper;
 import ru.practicum.shareit.item.model.Item;
 
 import javax.validation.constraints.NotBlank;
