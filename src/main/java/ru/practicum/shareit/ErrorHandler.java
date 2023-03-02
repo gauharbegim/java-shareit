@@ -40,7 +40,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleIncorrectParameterException(final IncorrectItemParameterException e) {
 
-        return new ErrorResponse("Unknown state: "+ e.getParameter());
+        return new ErrorResponse("Unknown state: " + e.getParameter());
     }
 
     @ExceptionHandler
@@ -64,6 +64,6 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleNoBookingStatusException(final MethodArgumentTypeMismatchException e) {
-        return new ErrorResponse("Unknown state: "+e.getValue());
+        return new ErrorResponse("Unknown state: " + e.getValue());
     }
 }
