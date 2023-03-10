@@ -41,6 +41,6 @@ public class CommentServiceImpl implements CommentService {
             comment.setText(commentDto.getText());
             commentRepository.save(comment);
         }
-        return null;
+        return itemDto;
     }
 }

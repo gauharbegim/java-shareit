@@ -1,6 +1,5 @@
 package ru.practicum.shareit;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,25 +14,24 @@ import ru.practicum.shareit.user.exceptions.IncorrectUserParameterException;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 
 @RestControllerAdvice
-@Slf4j
 public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleIncorrectParameterException(final IncorrectParameterException e) {
-        return new ErrorResponse(e.getMessage());
+    public ErrorResponse handleIncorrectParameterException(final IncorrectParameterException incorrectParameterException) {
+        return new ErrorResponse(incorrectParameterException.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleIncorrectUserParameterException(final IncorrectUserParameterException e) {
-        return new ErrorResponse(e.getMessage());
+    public ErrorResponse handleIncorrectUserParameterException(final IncorrectUserParameterException incorrectUserParameterException) {
+        return new ErrorResponse(incorrectUserParameterException.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleIncorrectUserParameterException(final DataIntegrityViolationException e) {
-        return new ErrorResponse(e.getMessage());
+    public ErrorResponse handleIncorrectUserParameterException(final DataIntegrityViolationException dataIntegrityViolationException) {
+        return new ErrorResponse(dataIntegrityViolationException.getMessage());
     }
 
     @ExceptionHandler
@@ -45,25 +43,25 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIncorrectParameterException(final IncorrectBookingParameterException e) {
-        return new ErrorResponse(e.getMessage());
+    public ErrorResponse handleIncorrectParameterException(final IncorrectBookingParameterException incorrectBookingParameterException) {
+        return new ErrorResponse(incorrectBookingParameterException.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleUserNotFoundException(final UserNotFoundException e) {
+    public ErrorResponse handleUserNotFoundException(final UserNotFoundException userNotFoundException) {
         return new ErrorResponse("Нет пользователя с таким ID");
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleUserNotFoundException(final BookingNotFoundException e) {
-        return new ErrorResponse("Нет пользователя с таким ID");
+    public ErrorResponse handleUserNotFoundException(final BookingNotFoundException bookingNotFoundException) {
+        return new ErrorResponse("Нет пользователя с таким ID={}");
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleNoBookingStatusException(final MethodArgumentTypeMismatchException e) {
-        return new ErrorResponse("Unknown state: " + e.getValue());
+    public ErrorResponse handleNoBookingStatusException(final MethodArgumentTypeMismatchException methodArgumentTypeMismatchException) {
+        return new ErrorResponse("Unknown state: " + methodArgumentTypeMismatchException.getValue());
     }
 }

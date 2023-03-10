@@ -15,7 +15,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    //    private final UserStorage userStorage;
     private final UserRepository userRepository;
 
     public UserDto addUser(UserDto userDto) {

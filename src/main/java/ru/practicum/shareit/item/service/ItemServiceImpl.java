@@ -21,7 +21,11 @@ import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.Optional;
+import java.util.List;
+import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 @Service

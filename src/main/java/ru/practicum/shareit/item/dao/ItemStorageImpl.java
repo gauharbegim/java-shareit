@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ItemStorageImpl implements ItemStorage {
-//    private final UserStorage userStorage;
     private final UserRepository userRepository;
     private Map<Integer, Item> items = new HashMap<>();
     private int counterId = 1;

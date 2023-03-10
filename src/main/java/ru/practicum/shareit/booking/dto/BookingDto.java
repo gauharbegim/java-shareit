@@ -6,6 +6,7 @@ import lombok.Data;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
 
+import javax.validation.constraints.FutureOrPresent;
 import java.util.Date;
 
 @Data
@@ -14,9 +15,11 @@ public class BookingDto {
     private Integer id;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @FutureOrPresent
     private Date start;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @FutureOrPresent
     private Date end;
 
     private Integer itemId;
