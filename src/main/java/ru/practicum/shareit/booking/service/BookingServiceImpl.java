@@ -2,6 +2,10 @@ package ru.practicum.shareit.booking.service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -120,10 +124,19 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getBooking(String state, Integer bookerId) {
+    public List<BookingDto> getBooking(String state, Integer bookerId, Integer from, Integer size) {
         Optional<User> user = userRepository.findById(bookerId);
         if (user.isPresent()) {
-            List<Booking> bookingList = bookingRepository.findByBooker(user.get());
+            List<Booking> bookingList = new ArrayList<>();
+            if (from != null && size != null && from >= 0 && size > 0) {
+                Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+                Pageable page = PageRequest.of(from, size, sortById);
+                Page<Booking> bookingPage = bookingRepository.findByBooker(user.get(), page);
+                bookingList = bookingPage.getContent();
+            } else {
+                bookingList = bookingRepository.findByBooker(user.get());
+            }
+
             List<Booking> list = new ArrayList<>();
             if (state.equals("CURRENT")) {
                 list = bookingList.stream()
@@ -164,13 +177,21 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> ownerItemsBooking(String state, Integer ownerId) {
+    public List<BookingDto> ownerItemsBooking(String state, Integer ownerId, Integer from, Integer size) {
         Optional<User> user = userRepository.findById(ownerId);
         if (user.isPresent()) {
             List<Item> ownerItemList = itemRepository.findByOwner(user.get());
             List<Booking> bookingList = new ArrayList<>();
             ownerItemList.stream().forEach(item -> {
-                        List<Booking> itemBookingList = bookingRepository.findByItem(item);
+                        List<Booking> itemBookingList = new ArrayList<>();
+                        if (from != null && size != null && from >= 0 && size > 0) {
+                            Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+                            Pageable page = PageRequest.of(from, size, sortById);
+                            Page<Booking> bookingPage = bookingRepository.findByItem(item, page);
+                            itemBookingList = bookingPage.getContent();
+                        } else {
+                            itemBookingList = bookingRepository.findByItem(item);
+                        }
                         bookingList.addAll(itemBookingList);
                     }
             );

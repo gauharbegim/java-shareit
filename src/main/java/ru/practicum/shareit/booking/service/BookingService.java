@@ -5,9 +5,9 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import java.util.List;
 
 public interface BookingService {
-    List<BookingDto> getBooking(String state, Integer bookerId);
+    List<BookingDto> getBooking(String state, Integer bookerId, Integer from, Integer size);
 
-    List<BookingDto> ownerItemsBooking(String state, Integer ownerId);
+    List<BookingDto> ownerItemsBooking(String state, Integer ownerId, Integer from, Integer size);
 
     BookingDto getBooking(Integer bookerId, Integer bookingId);
 
