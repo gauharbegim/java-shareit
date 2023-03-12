@@ -94,7 +94,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestDto> getItemRequests(Integer from, Integer size) {
         List<ItemRequest> itemRequestList = new ArrayList<>();
         if (from == null || size == null) {
-
+            return ItemRequestMapper.toItemRequestDtoList(itemRequestList);
         } else if (from < 0 || size < 0) {
             throw new ItemRequestNotFoundException("Неверные параметры");
         } else {
@@ -104,14 +104,13 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
             itemRequestList = itemRequestPage.getContent();
 
+            List<ItemRequestDto> itemRequestDtoList = ItemRequestMapper.toItemRequestDtoList(itemRequestList);
+            addItems(itemRequestDtoList);
+            itemRequestDtoList = sortItemRequestList(itemRequestDtoList);
 
+            return itemRequestDtoList;
         }
 
-        List<ItemRequestDto> itemRequestDtoList = ItemRequestMapper.toItemRequestDtoList(itemRequestList);
-        addItems(itemRequestDtoList);
-        itemRequestDtoList = sortItemRequestList(itemRequestDtoList);
-
-        return itemRequestDtoList;
     }
 
     private List<ItemRequestDto> sortItemRequestList(List<ItemRequestDto> itemRequestDtoList) {

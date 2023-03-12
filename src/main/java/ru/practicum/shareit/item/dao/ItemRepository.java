@@ -14,7 +14,9 @@ import java.util.List;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Integer> {
     Page<Item> findByOwner(User owner, Pageable page);
+
     List<Item> findByOwner(User owner);
+
     List<Item> findByRequestId(Integer requestId);
 
     @Query(nativeQuery = true, value = "SELECT * FROM ITEMS WHERE AVIABLE = true AND (upper(name) like %:text%  OR upper(description) like %:text%)")

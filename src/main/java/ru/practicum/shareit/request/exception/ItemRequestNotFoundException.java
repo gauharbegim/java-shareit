@@ -5,6 +5,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public class ItemRequestNotFoundException extends RuntimeException{
+public class ItemRequestNotFoundException extends RuntimeException {
     private final String message;
 }
