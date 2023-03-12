@@ -1,6 +1,7 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.comment.model;
 
 import lombok.*;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.Entity;
@@ -8,31 +9,32 @@ import javax.persistence.Table;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Column;
 import javax.persistence.ManyToOne;
 import javax.persistence.JoinColumn;
 
+import java.util.Date;
+
+@Table(name = "COMMENTS")
 @Entity
 @Getter
 @Setter
-@Table(name = "ITEMS")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Item {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String name;
+    private String text;
 
-    private String description;
-
-    @Column(name = "AVIABLE")
-    private Boolean isAvailable;
-
-    private Integer requestId;
+    @ManyToOne
+    @JoinColumn(name = "ITEM_ID", referencedColumnName = "ID")
+    private Item item;
 
     @ManyToOne
     @JoinColumn(name = "USER_ID", referencedColumnName = "ID")
-    private User owner;
+    private User author;
+
+    private Date dateCreated;
 }
+

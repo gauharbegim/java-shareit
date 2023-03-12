@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.List;
@@ -9,7 +10,9 @@ public interface ItemService {
 
     ItemDto update(Integer ownerId, Integer itemId, ItemDto itemDto);
 
-    ItemDto getItem(Integer itemId);
+    CommentDto addComment(Integer authorId, Integer itemId, CommentDto commentDto);
+
+    ItemDto getItem(Integer ownerId, Integer itemId);
 
     List<ItemDto> getItems(Integer ownerId);
 
