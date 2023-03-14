@@ -110,18 +110,22 @@ public class ItemServiceImpl implements ItemService {
         if (newItem.isPresent()) {
             Item item = newItem.get();
             ItemDto itemDto = ItemMapper.toItemDto(item);
-
-            if (item.getOwner().getId().equals(ownerId)) {
+            Integer itemOwnerId = item.getOwner().getId();
+            if (itemOwnerId.equals(ownerId)) {
                 List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
                         .filter(booking -> booking.getStatus().equals("APPROVED"))
                         .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
-                if (itemBookingList.size() > 1) {
+                if (itemBookingList.size() == 1) {
                     itemDto.setLastBooking(BookingMapper.toBookingDto(itemBookingList.get(itemBookingList.size() - 1)));
+                } else if (itemBookingList.size() > 1) {
+                    itemDto.setLastBooking(BookingMapper.toBookingDto(itemBookingList.get(itemBookingList.size() - 1)));
+
                     List<Booking> itemBookingListNext = itemBookingList.stream()
                             .filter(booking -> booking.getDateBegin().after(new Date()) && booking.getStatus().equals("APPROVED"))
                             .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                             .collect(Collectors.toList());
+
                     if (itemBookingListNext.size() > 1) {
                         itemDto.setNextBooking(BookingMapper.toBookingDto(itemBookingListNext.get(1)));
                     }
@@ -134,7 +138,6 @@ public class ItemServiceImpl implements ItemService {
             throw new IncorrectParameterException("Item не найден");
         }
     }
-
 
     @Override
     public List<ItemDto> getItems(Integer ownerId, Integer from, Integer size) {

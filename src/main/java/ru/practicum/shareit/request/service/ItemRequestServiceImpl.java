@@ -64,6 +64,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public ItemRequestDto getItemRequest(Integer userId, Integer id) {
         User requestor = getRequestorUser(userId);
+
         Optional<ItemRequest> itemRequestOptional = requestRepository.findById(id);
         if (itemRequestOptional.isPresent()) {
             ItemRequest itemRequest = itemRequestOptional.get();
@@ -74,6 +75,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
             return itemRequestDto;
         } else {
+            log.info("-------------Запрос не найден--------");
             throw new IncorrectParameterException("Запрос не найден");
         }
     }

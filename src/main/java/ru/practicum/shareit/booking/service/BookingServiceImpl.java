@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
@@ -57,12 +59,12 @@ public class BookingServiceImpl implements BookingService {
 
         Optional<Item> item = itemRepository.findById(bookingDto.getItemId());
         if (item.isPresent() && item.get().getIsAvailable()) {
-            if (item.get().getOwner().getId().equals(bookerId)) {
+            Integer ownerId = item.get().getOwner().getId();
+            if (ownerId.equals(bookerId)) {
                 throw new IncorrectParameterException("Неверные параметры");
             }
 
             Booking booking = new Booking();
-
             Optional<User> user = userRepository.findById(bookerId);
             if (user.isPresent()) {
                 booking.setBooker(user.get());
@@ -128,13 +130,15 @@ public class BookingServiceImpl implements BookingService {
         Optional<User> user = userRepository.findById(bookerId);
         if (user.isPresent()) {
             List<Booking> bookingList = new ArrayList<>();
-            if (from != null && size != null && from >= 0 && size > 0) {
+            if (from == null && size == null) {
+                bookingList = bookingRepository.findByBooker(user.get());
+            } else if (from >= 0 && size > 0) {
                 Sort sortById = Sort.by(Sort.Direction.ASC, "id");
                 Pageable page = PageRequest.of(from, size, sortById);
                 Page<Booking> bookingPage = bookingRepository.findByBooker(user.get(), page);
                 bookingList = bookingPage.getContent();
             } else {
-                bookingList = bookingRepository.findByBooker(user.get());
+                throw new IncorrectBookingParameterException("Неверные параметры");
             }
 
             List<Booking> list = new ArrayList<>();
@@ -184,13 +188,15 @@ public class BookingServiceImpl implements BookingService {
             List<Booking> bookingList = new ArrayList<>();
             ownerItemList.stream().forEach(item -> {
                         List<Booking> itemBookingList = new ArrayList<>();
-                        if (from != null && size != null && from >= 0 && size > 0) {
+                        if (from == null && size == null) {
+                            itemBookingList = bookingRepository.findByItem(item);
+                        } else if (from >= 0 && size > 0) {
                             Sort sortById = Sort.by(Sort.Direction.ASC, "id");
                             Pageable page = PageRequest.of(from, size, sortById);
                             Page<Booking> bookingPage = bookingRepository.findByItem(item, page);
                             itemBookingList = bookingPage.getContent();
                         } else {
-                            itemBookingList = bookingRepository.findByItem(item);
+                            throw new IncorrectBookingParameterException("Неверные параметры");
                         }
                         bookingList.addAll(itemBookingList);
                     }
