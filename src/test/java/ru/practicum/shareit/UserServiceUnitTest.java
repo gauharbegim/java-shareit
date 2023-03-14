@@ -18,7 +18,7 @@ public class UserServiceUnitTest {
     private final UserServiceImpl userService = new UserServiceImpl(mockUserRepository);
 
     @Test
-    public void shouldExceptionUserNotFound(){
+    public void shouldExceptionUserNotFound() {
         Mockito.when(mockUserRepository.findById(1)).thenReturn(Optional.empty());
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.getUser(1));
 
