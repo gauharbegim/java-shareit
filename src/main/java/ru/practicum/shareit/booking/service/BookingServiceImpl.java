@@ -2,6 +2,11 @@ package ru.practicum.shareit.booking.service;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -26,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
@@ -53,12 +59,12 @@ public class BookingServiceImpl implements BookingService {
 
         Optional<Item> item = itemRepository.findById(bookingDto.getItemId());
         if (item.isPresent() && item.get().getIsAvailable()) {
-            if (item.get().getOwner().getId().equals(bookerId)) {
+            Integer ownerId = item.get().getOwner().getId();
+            if (ownerId.equals(bookerId)) {
                 throw new IncorrectParameterException("Неверные параметры");
             }
 
             Booking booking = new Booking();
-
             Optional<User> user = userRepository.findById(bookerId);
             if (user.isPresent()) {
                 booking.setBooker(user.get());
@@ -120,10 +126,21 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getBooking(String state, Integer bookerId) {
+    public List<BookingDto> getBooking(String state, Integer bookerId, Integer from, Integer size) {
         Optional<User> user = userRepository.findById(bookerId);
         if (user.isPresent()) {
-            List<Booking> bookingList = bookingRepository.findByBooker(user.get());
+            List<Booking> bookingList = new ArrayList<>();
+            if (from == null && size == null) {
+                bookingList = bookingRepository.findByBooker(user.get());
+            } else if (from >= 0 && size > 0) {
+                Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+                Pageable page = PageRequest.of(from, size, sortById);
+                Page<Booking> bookingPage = bookingRepository.findByBooker(user.get(), page);
+                bookingList = bookingPage.getContent();
+            } else {
+                throw new IncorrectBookingParameterException("Неверные параметры");
+            }
+
             List<Booking> list = new ArrayList<>();
             if (state.equals("CURRENT")) {
                 list = bookingList.stream()
@@ -164,13 +181,23 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> ownerItemsBooking(String state, Integer ownerId) {
+    public List<BookingDto> ownerItemsBooking(String state, Integer ownerId, Integer from, Integer size) {
         Optional<User> user = userRepository.findById(ownerId);
         if (user.isPresent()) {
             List<Item> ownerItemList = itemRepository.findByOwner(user.get());
             List<Booking> bookingList = new ArrayList<>();
             ownerItemList.stream().forEach(item -> {
-                        List<Booking> itemBookingList = bookingRepository.findByItem(item);
+                        List<Booking> itemBookingList = new ArrayList<>();
+                        if (from == null && size == null) {
+                            itemBookingList = bookingRepository.findByItem(item);
+                        } else if (from >= 0 && size > 0) {
+                            Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+                            Pageable page = PageRequest.of(from, size, sortById);
+                            Page<Booking> bookingPage = bookingRepository.findByItem(item, page);
+                            itemBookingList = bookingPage.getContent();
+                        } else {
+                            throw new IncorrectBookingParameterException("Неверные параметры");
+                        }
                         bookingList.addAll(itemBookingList);
                     }
             );

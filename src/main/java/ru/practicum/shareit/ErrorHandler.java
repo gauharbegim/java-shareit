@@ -10,6 +10,7 @@ import ru.practicum.shareit.booking.exception.BookingNotFoundException;
 import ru.practicum.shareit.booking.exception.IncorrectBookingParameterException;
 import ru.practicum.shareit.item.exception.IncorrectItemParameterException;
 import ru.practicum.shareit.item.exception.IncorrectParameterException;
+import ru.practicum.shareit.request.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.user.exceptions.IncorrectUserParameterException;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 
@@ -63,5 +64,12 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleNoBookingStatusException(final MethodArgumentTypeMismatchException methodArgumentTypeMismatchException) {
         return new ErrorResponse("Unknown state: " + methodArgumentTypeMismatchException.getValue());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIncorrectParameterException(final ItemRequestNotFoundException itemRequestNotFoundException) {
+
+        return new ErrorResponse(itemRequestNotFoundException.getMessage());
     }
 }
