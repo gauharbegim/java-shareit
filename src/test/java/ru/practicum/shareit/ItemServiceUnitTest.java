@@ -8,9 +8,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.comment.dao.CommentRepository;
+import ru.practicum.shareit.comment.dto.AuthorDto;
+import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.model.User;
@@ -37,7 +40,7 @@ public class ItemServiceUnitTest {
     User booker = new User(2, "ppp@email.ru", "Polina");
     Booking booking = new Booking(1, dateBeg, dateEnd, item, booker, "APPROVED");
 
-    private final ItemServiceImpl itemService = new ItemServiceImpl(mockUserRepository, mockBookingRepository, mockItemRepository, mockCommentRepository);
+    private final ItemService itemService = new ItemServiceImpl(mockUserRepository, mockBookingRepository, mockItemRepository, mockCommentRepository);
 
     @Test
     public void shouldNotViewItemBookingsForOtherUser() {
@@ -52,12 +55,29 @@ public class ItemServiceUnitTest {
 
     @Test
     public void shouldViewItemBookingsForOwner() {
-        Mockito.when(mockItemRepository.findById(1)).thenReturn(Optional.of(item));
-        Mockito.when(mockUserRepository.findById(1)).thenReturn(Optional.of(owner));
+        Mockito.when(mockItemRepository.findById(item.getId())).thenReturn(Optional.of(item));
+        Mockito.when(mockUserRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
         Mockito.when(mockBookingRepository.findByItem(item)).thenReturn(List.of(booking));
 
         ItemDto itemDto = itemService.getItem(1, 1);
         Assertions.assertNotNull(itemDto.getLastBooking());
+    }
+
+    @Test
+    public void shouldAddComment() {
+        User author = new User(3, "sabrina@email.ru", "Sabrina");
+        Mockito.when(mockUserRepository.findById(author.getId())).thenReturn(Optional.of(author));
+        Mockito.when(mockItemRepository.findById(item.getId())).thenReturn(Optional.of(item));
+
+        dateBeg = getDate("2023-02-21");
+        dateEnd = getDate("2023-03-01");
+        Booking authorBooking = new Booking(2, dateBeg, dateEnd, item, author, "APPROVED");
+        Mockito.when(mockBookingRepository.findByItemAndBooker(item, author)).thenReturn(List.of(authorBooking));
+
+        AuthorDto authorDto = new AuthorDto(author.getId(), author.getName(), author.getEmail());
+        CommentDto comment = new CommentDto(null, "this is test comment", item, authorDto, authorDto.getAuthorName(), new Date());
+        CommentDto newComment = itemService.addComment(author.getId(), item.getId(), comment);
+        Assertions.assertNotNull(newComment);
     }
 
 

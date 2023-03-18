@@ -7,6 +7,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingStatus;
+import ru.practicum.shareit.booking.exception.BookingNotFoundException;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -21,6 +24,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -64,6 +69,16 @@ public class BookServiceUnitTest {
     }
 
     @Test
+    public void shouldReturnBookingNotFoundException() {
+        Mockito.when(mockBookingRepository.findById(any())).thenReturn(Optional.empty());
+
+        BookingNotFoundException exception = Assertions.assertThrows(BookingNotFoundException.class,
+                () -> bookingService.getBooking(1, 1));
+
+        Assertions.assertEquals("Брони с таким id нет", exception.getMessage());
+    }
+
+    @Test
     public void shouldSuccessBook() {
         Mockito.when(mockItemRepository.findById(1)).thenReturn(Optional.of(item));
         User booker = new User(2, "sss@email.ru", "Sasha");
@@ -74,6 +89,35 @@ public class BookServiceUnitTest {
         BookingDto newBooking = bookingService.booking(2, bookingDto);
 
         Assertions.assertNotNull(newBooking);
+    }
+
+    @Test
+    public void shouldSuccessGetBooking() {
+        Mockito.when(mockItemRepository.findById(1)).thenReturn(Optional.of(item));
+        User booker = new User(2, "sss@email.ru", "Sasha");
+        Mockito.when(mockUserRepository.findById(2)).thenReturn(Optional.of(booker));
+
+        Booking booking = new Booking(1, dateBeg, dateEnd, item, booker, "APPROVED");
+        Mockito.when(mockBookingRepository.findById(1)).thenReturn(Optional.of(booking));
+
+        BookingDto newBooking = bookingService.getBooking(2, 1);
+
+        Assertions.assertNotNull(newBooking);
+    }
+
+    @Test
+    public void shouldGetBookingWithFailedUser() {
+        Mockito.when(mockItemRepository.findById(1)).thenReturn(Optional.of(item));
+        User booker = new User(2, "sss@email.ru", "Sasha");
+        Mockito.when(mockUserRepository.findById(2)).thenReturn(Optional.of(booker));
+
+        Booking booking = new Booking(1, dateBeg, dateEnd, item, booker, "APPROVED");
+        Mockito.when(mockBookingRepository.findById(1)).thenReturn(Optional.of(booking));
+
+        BookingNotFoundException exception = Assertions.assertThrows(BookingNotFoundException.class,
+                () -> bookingService.getBooking(3, 1));
+
+        Assertions.assertEquals("Неверные параметры", exception.getMessage());
     }
 
     private Date getDate(String stringDate) {

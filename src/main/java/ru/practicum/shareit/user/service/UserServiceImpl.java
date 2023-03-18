@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
@@ -24,15 +26,11 @@ public class UserServiceImpl implements UserService {
     }
 
     public void deleteUser(Integer userId) {
-        if (userId < 1) {
-            throw new UserNotFoundException("Id пользователя должно быть больше 0");
-        }
         userRepository.deleteById(userId);
     }
 
     public UserDto updateUser(Integer id, UserDto userDto) {
         User userByEmail = null;
-
         if (userDto.getEmail() != null) {
             userByEmail = userRepository.findByEmail(userDto.getEmail());
         }
