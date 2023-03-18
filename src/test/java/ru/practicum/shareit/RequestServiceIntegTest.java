@@ -24,21 +24,21 @@ public class RequestServiceIntegTest {
     private final UserService userService;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         createRequestor();
     }
 
     @Test
     public void shouldSuccessAddRequest() {
         UserDto requestorDto = userService.getUser(1);
-        ItemRequestDto itemRequest = new ItemRequestDto(null, "Крньки 39 размера",requestorDto, new Date(), null);
+        ItemRequestDto itemRequest = new ItemRequestDto(null, "Крньки 39 размера", requestorDto, new Date(), null);
         ItemRequestDto newItemRequest = requestService.addItemRequest(1, itemRequest);
 
         Assertions.assertNotNull(newItemRequest);
         Assertions.assertEquals(newItemRequest.getDescription(), itemRequest.getDescription());
     }
 
-    private void createRequestor(){
+    private void createRequestor() {
         UserDto userDto = new UserDto();
         userDto.setEmail("ttt@email.ru");
         userDto.setName("Tanya");

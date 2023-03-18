@@ -10,7 +10,7 @@ import ru.practicum.shareit.utilits.Variables;
 public class VariableUnitTest {
 
     @Test
-    public void shouldNotModifyVariables(){
+    public void shouldNotModifyVariables() {
         Assertions.assertNotNull(Variables.USER_ID);
         Assertions.assertEquals(Variables.USER_ID, "X-Sharer-User-Id");
     }

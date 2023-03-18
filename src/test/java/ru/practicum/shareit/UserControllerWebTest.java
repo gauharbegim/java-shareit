@@ -1,6 +1,5 @@
 package ru.practicum.shareit;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.nio.charset.StandardCharsets;
@@ -104,18 +102,6 @@ public class UserControllerWebTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email", is("newEmail")));
     }
-//
-//    @Test
-//    public void shouldNotGetUserByIdWithoutId() throws Exception {
-//        Mockito.doReturn(
-//                (new ErrorResponse("Нет пользователя с таким ID"))
-//        )
-//                .when(Mockito.when(userService.getUser(Mockito.anyInt())).thenThrow(UserNotFoundException.class));
-//
-//        mockMvc.perform(get("/users/{id}", 1)
-//                .characterEncoding(StandardCharsets.UTF_8))
-//                .andExpect(status().isNotFound());
-//    }
 
     @Test
     public void shouldDelete() throws Exception {
