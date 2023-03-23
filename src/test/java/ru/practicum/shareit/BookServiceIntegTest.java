@@ -32,7 +32,6 @@ import java.util.Date;
         properties = "db.name=test",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Transactional
 public class BookServiceIntegTest {
     private final EntityManager entityManager;
     private final BookingService bookingService;
@@ -51,11 +50,10 @@ public class BookServiceIntegTest {
         bookerDto = UserMapper.toUserDto(booker);
         userService.addUser(bookerDto);
 
-
         dateBeg = getDate("2023-03-29");
         dateEnd = getDate("2023-04-15");
 
-        User owner = new User(1, "eee@email.ru", "Eva");
+        User owner = new User(null, "eee@email.ru", "Eva");
         UserDto ownerDto = UserMapper.toUserDto(owner);
         UserDto newOwner = userService.addUser(ownerDto);
 
