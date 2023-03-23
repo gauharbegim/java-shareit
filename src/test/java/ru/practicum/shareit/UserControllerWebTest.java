@@ -2,6 +2,7 @@ package ru.practicum.shareit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.exceptions.IncorrectUserParameterException;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.nio.charset.StandardCharsets;
@@ -43,6 +45,7 @@ public class UserControllerWebTest {
     private void setUp() {
         mockMvc = MockMvcBuilders
                 .standaloneSetup(userController)
+                .setControllerAdvice(ErrorHandler.class)
                 .build();
 
         userDto = new UserDto(1, "Sasha", "sss@email.ru");
@@ -101,6 +104,19 @@ public class UserControllerWebTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email", is("newEmail")));
+    }
+
+    @Test
+    public void shouldUpdateToExistsEmailFailed() throws Exception {
+        Mockito.when(userService.updateUser(Mockito.anyInt(), any()))
+                .thenThrow(new IncorrectUserParameterException("Такой email уже существует"));
+
+        mockMvc.perform(patch("/users/{id}", 1)
+                .content(mapper.writeValueAsString(userDto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict());
     }
 
     @Test

@@ -103,13 +103,13 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             Sort sortById = Sort.by(Sort.Direction.ASC, "id");
             Pageable page = PageRequest.of(from, size, sortById);
             Page<ItemRequest> itemRequestPage = requestRepository.findAll(page);
-
-            itemRequestList = itemRequestPage.getContent();
-
-            List<ItemRequestDto> itemRequestDtoList = ItemRequestMapper.toItemRequestDtoList(itemRequestList);
-            addItems(itemRequestDtoList);
-            itemRequestDtoList = sortItemRequestList(itemRequestDtoList);
-
+            List<ItemRequestDto> itemRequestDtoList = null;
+            if (itemRequestPage != null) {
+                itemRequestList = itemRequestPage.getContent();
+                itemRequestDtoList = ItemRequestMapper.toItemRequestDtoList(itemRequestList);
+                addItems(itemRequestDtoList);
+                itemRequestDtoList = sortItemRequestList(itemRequestDtoList);
+            }
             return itemRequestDtoList;
         }
 

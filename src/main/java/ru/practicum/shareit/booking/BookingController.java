@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.utilits.Variables;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -63,8 +65,6 @@ public class BookingController {
                                                    @RequestParam(name = "state", required = false, defaultValue = "ALL") BookingStatus state,
                                                    @RequestParam(required = false, name = "from") Integer from,
                                                    @RequestParam(required = false, name = "size") Integer size) {
-        return bookingService.ownerItemsBooking(state, ownerId, from, size);
+        return bookingService.ownerItemsBookingLists(state, ownerId, from, size);
     }
-
-
 }

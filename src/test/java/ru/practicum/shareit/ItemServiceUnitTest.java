@@ -10,6 +10,8 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.comment.dao.CommentRepository;
 import ru.practicum.shareit.comment.dto.AuthorDto;
 import ru.practicum.shareit.comment.dto.CommentDto;
+import ru.practicum.shareit.comment.mapper.ComentMapper;
+import ru.practicum.shareit.comment.model.Comment;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
@@ -23,6 +25,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceUnitTest {
@@ -54,13 +58,32 @@ public class ItemServiceUnitTest {
     }
 
     @Test
-    public void shouldViewItemBookingsForOwner() {
+    public void shouldViewItemBookingsForOwnerWithOneBooking() {
         Mockito.when(mockItemRepository.findById(item.getId())).thenReturn(Optional.of(item));
         Mockito.when(mockUserRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
         Mockito.when(mockBookingRepository.findByItem(item)).thenReturn(List.of(booking));
 
         ItemDto itemDto = itemService.getItem(1, 1);
         Assertions.assertNotNull(itemDto.getLastBooking());
+    }
+
+    @Test
+    public void shouldViewItemBookingsForOwnerWIthMultipleBookings() {
+        Mockito.when(mockItemRepository.findById(item.getId())).thenReturn(Optional.of(item));
+        Mockito.when(mockUserRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
+
+        dateBeg = getDate("2022-10-29");
+        dateEnd = getDate("2022-11-15");
+        Booking booking1 = new Booking(2, dateBeg, dateEnd, item, booker, "APPROVED");
+
+        dateBeg = getDate("2022-12-29");
+        dateEnd = getDate("2023-01-15");
+        Booking booking2 = new Booking(3, dateBeg, dateEnd, item, booker, "APPROVED");
+        Mockito.when(mockBookingRepository.findByItem(item)).thenReturn(List.of(booking, booking1, booking2));
+
+        ItemDto itemDto = itemService.getItem(1, 1);
+        Assertions.assertNotNull(itemDto.getLastBooking());
+        Assertions.assertEquals(itemDto.getLastBooking().getId(), booking1.getId());
     }
 
     @Test
@@ -80,6 +103,67 @@ public class ItemServiceUnitTest {
         Assertions.assertNotNull(newComment);
     }
 
+    @Test
+    public void shouldMapToCommentDtoList() {
+        User author = new User(3, "sabrina@email.ru", "Sabrina");
+        Comment comment1 = new Comment(1, "text1", item, author, new Date());
+        Comment comment2 = new Comment(1, "text2", item, author, new Date());
+        List<Comment> commentList = List.of(comment1, comment2);
+        List<CommentDto> commentDto = ComentMapper.commentDtoList(commentList);
+        Assertions.assertNotNull(commentDto);
+        Assertions.assertEquals(commentDto.get(0).getText(), comment1.getText());
+        Assertions.assertEquals(commentDto.get(1).getText(), comment2.getText());
+    }
+
+    @Test
+    public void shouldMapToComment() {
+        User author = new User(3, "sabrina@email.ru", "Sabrina");
+        AuthorDto authorDto = new AuthorDto(author.getId(), author.getName(), author.getEmail());
+        CommentDto commentDto = new CommentDto(null, "this is test comment", item, authorDto, authorDto.getAuthorName(), new Date());
+        Comment comment = ComentMapper.toComment(commentDto);
+        Assertions.assertNotNull(comment);
+        Assertions.assertEquals(comment.getText(), commentDto.getText());
+        Assertions.assertEquals(comment.getDateCreated(), commentDto.getCreated());
+        Assertions.assertEquals(comment.getItem().getName(), commentDto.getItem().getName());
+    }
+
+    @Test
+    public void shouldSuccessGetItems() {
+        Mockito.when(mockUserRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(owner));
+        Mockito.when(mockItemRepository.findByOwner(any())).thenReturn(List.of(item));
+        dateBeg = getDate("2022-10-29");
+        dateEnd = getDate("2022-11-15");
+        Booking booking1 = new Booking(2, dateBeg, dateEnd, item, booker, "APPROVED");
+
+        dateBeg = getDate("2022-12-29");
+        dateEnd = getDate("2023-01-15");
+        Booking booking2 = new Booking(3, dateBeg, dateEnd, item, booker, "APPROVED");
+        Mockito.when(mockBookingRepository.findByItem(item)).thenReturn(List.of(booking, booking1, booking2));
+
+        List<ItemDto> list = itemService.getItems(owner.getId(), null, null);
+
+        Assertions.assertNotNull(list);
+        Assertions.assertNotNull(list.get(0).getLastBooking());
+        Assertions.assertNotNull(list.get(0).getNextBooking());
+    }
+
+    @Test
+    public void shouldSuccessUpdateItem() {
+        Mockito.when(mockUserRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(owner));
+
+        Item oldItem = new Item(2, "pled", "warm", true, null, owner);
+        Mockito.when(mockItemRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(item));
+        Mockito.when(mockItemRepository.save(any())).thenReturn(item);
+
+        ItemDto newItem = new ItemDto(2, "плед", "теплый", true, null, null, null, null);
+        Assertions.assertNotEquals(oldItem.getName(), newItem.getName());
+        Assertions.assertNotEquals(oldItem.getDescription(), newItem.getDescription());
+
+        ItemDto updatedItem = itemService.update(owner.getId(), oldItem.getId(), newItem);
+
+        Assertions.assertEquals(updatedItem.getName(), newItem.getName());
+        Assertions.assertEquals(updatedItem.getDescription(), newItem.getDescription());
+    }
 
     private Date getDate(String stringDate) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");

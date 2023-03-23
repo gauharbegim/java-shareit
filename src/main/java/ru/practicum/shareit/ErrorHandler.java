@@ -31,7 +31,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleIncorrectUserParameterException(final DataIntegrityViolationException dataIntegrityViolationException) {
+    public ErrorResponse handleDataIntegrityViolationException(final DataIntegrityViolationException dataIntegrityViolationException) {
         return new ErrorResponse(dataIntegrityViolationException.getMessage());
     }
 
@@ -48,7 +48,7 @@ public class ErrorHandler {
         return new ErrorResponse(incorrectBookingParameterException.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleUserNotFoundException(final UserNotFoundException userNotFoundException) {
         return new ErrorResponse("Нет пользователя с таким ID");
@@ -56,7 +56,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleUserNotFoundException(final BookingNotFoundException bookingNotFoundException) {
+    public ErrorResponse handleBookingNotFoundException(final BookingNotFoundException bookingNotFoundException) {
         return new ErrorResponse("Нет пользователя с таким ID={}");
     }
 
@@ -68,7 +68,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIncorrectParameterException(final ItemRequestNotFoundException itemRequestNotFoundException) {
+    public ErrorResponse handleItemRequestNotFoundException(final ItemRequestNotFoundException itemRequestNotFoundException) {
 
         return new ErrorResponse(itemRequestNotFoundException.getMessage());
     }

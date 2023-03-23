@@ -28,7 +28,7 @@ public class ItemController {
     private final String pathId = "/{id}";
     private final String pathComment = "/{id}/comment";
 
-    @GetMapping()
+    @GetMapping
     public List<ItemDto> getItems(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
                                   @RequestParam(required = false, name = "from") Integer from,
                                   @RequestParam(required = false, name = "size") Integer size) {

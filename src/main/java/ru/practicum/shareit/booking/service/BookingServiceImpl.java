@@ -129,6 +129,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getBooking(BookingStatus state, Integer bookerId, Integer from, Integer size) {
         Optional<User> user = userRepository.findById(bookerId);
+        log.info("-----> user:"+user);
         if (user.isPresent()) {
             List<Booking> bookingList = new ArrayList<>();
             if (from == null && size == null) {
@@ -151,43 +152,50 @@ public class BookingServiceImpl implements BookingService {
 
     private List<Booking> getBookingListByStatus(BookingStatus state, List<Booking> bookingList) {
         List<Booking> list = new ArrayList<>();
-        if (state.equals(BookingStatus.CURRENT)) {
-            list = bookingList.stream()
-                    .filter(booking -> booking.getDateBegin().before(new Date()))
-                    .filter(booking -> booking.getDateEnd().after(new Date()))
-                    .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                    .collect(Collectors.toList());
-        } else if (state.equals(BookingStatus.REJECTED)) {
-            list = bookingList.stream()
-                    .filter(booking -> booking.getStatus().equals("REJECTED"))
-                    .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                    .collect(Collectors.toList());
-        } else if (state.equals(BookingStatus.WAITING)) {
-            list = bookingList.stream()
-                    .filter(booking -> booking.getStatus().equals("WAITING"))
-                    .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                    .collect(Collectors.toList());
-        } else if (state.equals(BookingStatus.PAST)) {
-            list = bookingList.stream()
-                    .filter(booking -> booking.getDateBegin().before(new Date()))
-                    .filter(booking -> booking.getDateEnd().before(new Date()))
-                    .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                    .collect(Collectors.toList());
-        } else if (state.equals(BookingStatus.FUTURE)) {
-            list = bookingList.stream()
-                    .filter(booking -> booking.getDateBegin().after(new Date()) && booking.getDateEnd().after(new Date()))
-                    .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                    .collect(Collectors.toList());
-        } else {
-            list = bookingList.stream()
-                    .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                    .collect(Collectors.toList());
+        switch (state) {
+            case PAST:
+                list = bookingList.stream()
+                        .filter(booking -> booking.getDateBegin().before(new Date()))
+                        .filter(booking -> booking.getDateEnd().before(new Date()))
+                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
+                        .collect(Collectors.toList());
+                break;
+            case FUTURE:
+                list = bookingList.stream()
+                        .filter(booking -> booking.getDateBegin().after(new Date()) && booking.getDateEnd().after(new Date()))
+                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
+                        .collect(Collectors.toList());
+                break;
+            case CURRENT:
+                list = bookingList.stream()
+                        .filter(booking -> booking.getDateBegin().before(new Date()))
+                        .filter(booking -> booking.getDateEnd().after(new Date()))
+                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
+                        .collect(Collectors.toList());
+                break;
+            case WAITING:
+                list = bookingList.stream()
+                        .filter(booking -> booking.getStatus().equals("WAITING"))
+                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
+                        .collect(Collectors.toList());
+                break;
+            case REJECTED:
+                list = bookingList.stream()
+                        .filter(booking -> booking.getStatus().equals("REJECTED"))
+                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
+                        .collect(Collectors.toList());
+                break;
+            case ALL:
+                list = bookingList.stream()
+                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
+                        .collect(Collectors.toList());
+                break;
         }
         return list;
     }
 
     @Override
-    public List<BookingDto> ownerItemsBooking(BookingStatus state, Integer ownerId, Integer from, Integer size) {
+    public List<BookingDto> ownerItemsBookingLists(BookingStatus state, Integer ownerId, Integer from, Integer size) {
         Optional<User> user = userRepository.findById(ownerId);
         if (user.isPresent()) {
             List<Item> ownerItemList = itemRepository.findByOwner(user.get());

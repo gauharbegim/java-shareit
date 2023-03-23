@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.shareit.request.ItemRequestController;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.utilits.Variables;
 
@@ -46,13 +47,14 @@ public class RequestControllerWebTest {
     private void setUp() {
         mockMvc = MockMvcBuilders
                 .standaloneSetup(requestController)
+                .setControllerAdvice(ErrorHandler.class)
                 .build();
 
         requestDto = new ItemRequestDto(1, "коньки для катания", null, new Date(), null);
     }
 
     @Test
-    public void shouldSuccessAddUser() throws Exception {
+    public void shouldSuccessAddRequest() throws Exception {
         Mockito.when(requestService.addItemRequest(Mockito.anyInt(), any()))
                 .thenReturn(requestDto);
 
@@ -67,9 +69,25 @@ public class RequestControllerWebTest {
                 .andExpect(jsonPath("$.description", is(requestDto.getDescription())));
     }
 
+    @Test
+    public void shouldFailAddRequestWithNullDescription() throws Exception {
+        Mockito.when(requestService.addItemRequest(Mockito.anyInt(), any()))
+                .thenThrow(new ItemRequestNotFoundException("Описание не может быть пустым"));
+
+        requestDto.setDescription(null);
+
+        mockMvc.perform(post("/requests")
+                .header(Variables.USER_ID, 2)
+                .content(mapper.writeValueAsString(requestDto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 
     @Test
-    public void shouldSuccessGetUsers() throws Exception {
+    public void shouldSuccessGetRequests() throws Exception {
         Mockito.when(requestService.getItemRequests(Mockito.anyInt(), Mockito.anyInt())).thenReturn(List.of(requestDto));
 
         mockMvc.perform(get("/requests/all")
@@ -84,7 +102,7 @@ public class RequestControllerWebTest {
     }
 
     @Test
-    public void shouldSuccessGetUserById() throws Exception {
+    public void shouldSuccessGetRequestById() throws Exception {
         Mockito.when(requestService.getItemRequest(Mockito.anyInt(),Mockito.anyInt())).thenReturn(requestDto);
 
         mockMvc.perform(get("/requests/{id}", "2")
@@ -96,7 +114,7 @@ public class RequestControllerWebTest {
     }
 
     @Test
-    public void shouldSuccessGetUsersListById() throws Exception {
+    public void shouldSuccessGetRequestListByUserId() throws Exception {
         Mockito.when(requestService.getItemRequests(Mockito.anyInt())).thenReturn(List.of(requestDto));
 
         mockMvc.perform(get("/requests")
