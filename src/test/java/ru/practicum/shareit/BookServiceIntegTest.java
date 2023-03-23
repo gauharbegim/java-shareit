@@ -22,6 +22,7 @@ import ru.practicum.shareit.user.service.UserService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,6 +32,7 @@ import java.util.Date;
         properties = "db.name=test",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Transactional
 public class BookServiceIntegTest {
     private final EntityManager entityManager;
     private final BookingService bookingService;
@@ -60,7 +62,6 @@ public class BookServiceIntegTest {
         userService.addUser(bookerDto);
 
         itemService.addItem(1, itemDto);
-
     }
 
     @Test
