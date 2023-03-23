@@ -59,7 +59,7 @@ public class BookServiceIntegTest {
         Item item = new Item(null, "carpet", "description", true, null, UserMapper.toUserModel(newOwner));
         itemDto = ItemMapper.toItemDto(item);
 
-        itemService.addItem(newOwner.getId(), itemDto);
+        itemDto = itemService.addItem(newOwner.getId(), itemDto);
     }
 
     @Test
