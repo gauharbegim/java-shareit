@@ -56,9 +56,10 @@ public class BookServiceIntegTest {
         UserDto ownerDto = UserMapper.toUserDto(owner);
         UserDto newOwner = userService.addUser(ownerDto);
 
-        Item item = new Item(1, "carpet", "description", true, null, UserMapper.toUserModel(newOwner));
+        Item item = new Item(null, "carpet", "description", true, null, UserMapper.toUserModel(newOwner));
         itemDto = ItemMapper.toItemDto(item);
-        itemService.addItem(1, itemDto);
+
+        itemService.addItem(newOwner.getId(), itemDto);
     }
 
     @Test
