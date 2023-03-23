@@ -15,6 +15,7 @@ import ru.practicum.shareit.comment.mapper.ComentMapper;
 import ru.practicum.shareit.comment.model.Comment;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.exception.IncorrectItemParameterException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
@@ -56,6 +57,22 @@ public class ItemServiceUnitTest {
 
         ItemDto itemDto = itemService.getItem(2, 1);
         Assertions.assertNull(itemDto.getLastBooking());
+    }
+
+    @Test
+    public void shouldFailAddItemWithIncorrectParam() {
+        ItemDto newItem = new ItemDto(null, null, null, null, null, null, null, null);
+        IncorrectItemParameterException exception = Assertions.assertThrows(IncorrectItemParameterException.class, () -> itemService.addItem(owner.getId(), newItem));
+        Assertions.assertNotNull(exception);
+
+        ItemDto newItemWithoutName = new ItemDto(null, null, null, true, null, null, null, null);
+        exception = Assertions.assertThrows(IncorrectItemParameterException.class, () -> itemService.addItem(owner.getId(), newItemWithoutName));
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(exception.getParameter(), "Название не может быть пустой");
+
+        ItemDto newItemWithoutDescription = new ItemDto(null, "name", null, true, null, null, null, null);
+        exception = Assertions.assertThrows(IncorrectItemParameterException.class, () -> itemService.addItem(owner.getId(), newItemWithoutDescription));
+        Assertions.assertNotNull(exception, "Описание не может быть пустой");
     }
 
     @Test

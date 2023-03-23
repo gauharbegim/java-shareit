@@ -7,6 +7,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.exceptions.IncorrectUserParameterException;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -44,6 +45,18 @@ public class UserServiceUnitTest {
 
         Assertions.assertEquals(user.getName(), userDto.getName());
         Assertions.assertEquals(user.getEmail(), userDto.getEmail());
+    }
+
+    @Test
+    public void shouldFailUpdateUserWithExistsEmail() {
+        User user = new User(1, "new_alina@email.ru", "Adina");
+        Mockito.when(mockUserRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(user));
+        Mockito.when(mockUserRepository.findByEmail(Mockito.anyString())).thenThrow(new IncorrectUserParameterException("Такой email уже существует"));
+        UserDto userDto = new UserDto(1, "Alina", "new_alina@email.ru");
+
+        IncorrectUserParameterException exception = Assertions.assertThrows(IncorrectUserParameterException.class, () -> userService.updateUser(1, userDto));
+
+        Assertions.assertNotNull(exception.getParameter());
     }
 
     @Test

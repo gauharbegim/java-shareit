@@ -62,7 +62,6 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleItemRequestNotFoundException(final ItemRequestNotFoundException itemRequestNotFoundException) {
-
         return new ErrorResponse(itemRequestNotFoundException.getMessage());
     }
 }

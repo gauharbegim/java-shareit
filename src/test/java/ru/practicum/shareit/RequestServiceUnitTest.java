@@ -11,6 +11,7 @@ import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.exception.IncorrectParameterException;
 import ru.practicum.shareit.request.dao.ItemRequestRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.service.ItemRequestService;
@@ -24,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -82,6 +84,26 @@ public class RequestServiceUnitTest {
     }
 
     @Test
+    public void shouldGetItemRequestsByPageParam() {
+        User requestor = new User(1, "sss@email.ru", "Sasha");
+        ItemRequest request1 = new ItemRequest(1, "костюм клоуна", requestor, getDate("2023-01-15"));
+        ItemRequest request2 = new ItemRequest(2, "Платье ретро", requestor, getDate("2023-03-15"));
+        ItemRequest request3 = new ItemRequest(3, "Костюм микки-маус", requestor, getDate("2023-03-01"));
+        Mockito.when(mockItemRequestRepository.findAll()).thenReturn(List.of(request1, request2, request3));
+
+        ItemRequestNotFoundException exception = Assertions.assertThrows(ItemRequestNotFoundException.class,
+                () -> requestService.getItemRequests(-1, -1)
+        );
+
+        Assertions.assertNotNull(exception);
+
+        List<ItemRequestDto> lsitItems = requestService.getItemRequests(null, null);
+        Assertions.assertNotNull(lsitItems);
+        Assertions.assertEquals(lsitItems.size(), 3);
+
+    }
+
+    @Test
     public void shouldReturnIncorrectParamException() {
         User requestor = new User(1, "eee@email.ru", "Eva");
         Mockito.when(mockUserRepository.findById(1)).thenReturn(Optional.of(requestor));
@@ -90,6 +112,19 @@ public class RequestServiceUnitTest {
         );
 
         Assertions.assertEquals("Запрос не найден", exception.getParameter());
+    }
+
+    @Test
+    public void shouldSuccessGetItemRequest() {
+        User requestor = new User(1, "eee@email.ru", "Eva");
+        Mockito.when(mockUserRepository.findById(1)).thenReturn(Optional.of(requestor));
+        ItemRequest request = new ItemRequest(1, "костюм клоуна", requestor, getDate("2023-01-15"));
+        Mockito.when(mockItemRequestRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(request));
+        Mockito.when(mockItemRepository.findByRequestId(Mockito.anyInt())).thenReturn(new ArrayList<>());
+
+        ItemRequestDto itemRequestDto = requestService.getItemRequest(1, 1);
+        Assertions.assertEquals(itemRequestDto.getDescription(), request.getDescription());
+
     }
 
     @Test

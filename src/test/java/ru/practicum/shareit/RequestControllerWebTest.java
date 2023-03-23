@@ -85,7 +85,6 @@ public class RequestControllerWebTest {
                 .andExpect(status().isBadRequest());
     }
 
-
     @Test
     public void shouldSuccessGetRequests() throws Exception {
         Mockito.when(requestService.getItemRequests(Mockito.anyInt(), Mockito.anyInt())).thenReturn(List.of(requestDto));
@@ -99,6 +98,19 @@ public class RequestControllerWebTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(requestDto.getId()), Integer.class))
                 .andExpect(jsonPath("$[0].description", is(requestDto.getDescription())));
+    }
+
+    @Test
+    public void shouldFailGetRequestsByPage() throws Exception {
+        Mockito.when(requestService.getItemRequests(Mockito.anyInt(), Mockito.anyInt())).thenThrow(new ItemRequestNotFoundException("Неверные параметры"));
+
+        mockMvc.perform(get("/requests/all")
+                .characterEncoding(StandardCharsets.UTF_8)
+                .param("from", "1")
+                .param("size", "2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

@@ -96,6 +96,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestDto> getItemRequests(Integer from, Integer size) {
         List<ItemRequest> itemRequestList = new ArrayList<>();
         if (from == null || size == null) {
+            itemRequestList = requestRepository.findAll();
             return ItemRequestMapper.toItemRequestDtoList(itemRequestList);
         } else if (from < 0 || size < 0) {
             throw new ItemRequestNotFoundException("Неверные параметры");

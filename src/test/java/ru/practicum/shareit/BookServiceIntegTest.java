@@ -47,7 +47,7 @@ public class BookServiceIntegTest {
 
         User booker = new User(2, "ssss@email.ru", "Sasha");
         bookerDto = UserMapper.toUserDto(booker);
-        userService.addUser(bookerDto);
+        bookerDto = userService.addUser(bookerDto);
 
         dateBeg = getDate("2023-03-29");
         dateEnd = getDate("2023-04-15");

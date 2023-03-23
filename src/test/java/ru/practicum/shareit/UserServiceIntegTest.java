@@ -10,6 +10,8 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.util.List;
+
 @Slf4j
 @SpringBootTest(
         properties = "db.name=test",
@@ -32,6 +34,18 @@ public class UserServiceIntegTest {
 
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.getUser(newUser.getId()));
         Assertions.assertEquals("Пользователь не найден", exception.getMessage());
+    }
+
+    @Test
+    public void shouldSuccessGetRequwstList() {
+        UserDto user = new UserDto(null, "Masha", "mmm@mail.ru");
+        userService.addUser(user);
+
+        UserDto user2 = new UserDto(null, "Natasha", "nnn@mail.ru");
+        userService.addUser(user2);
+
+        List<UserDto> list = userService.getUsersList();
+        Assertions.assertEquals(list.size(), 2);
     }
 
 }
