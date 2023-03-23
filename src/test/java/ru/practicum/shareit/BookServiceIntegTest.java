@@ -4,6 +4,7 @@ package ru.practicum.shareit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,24 +37,34 @@ public class BookServiceIntegTest {
     private final UserService userService;
     private final ItemService itemService;
 
-    @Test
-    public void shouldSuccessBooking() {
+    Date dateBeg = null;
+    Date dateEnd = null;
+    ItemDto itemDto = null;
+    UserDto bookerDto = null;
+
+    @BeforeEach
+    public void setup() {
         User owner = new User(1, "eee@email.ru", "Eva");
         UserDto ownerDto = UserMapper.toUserDto(owner);
 
         User booker = new User(2, "ssss@email.ru", "Sasha");
-        UserDto bookerDto = UserMapper.toUserDto(booker);
+        bookerDto = UserMapper.toUserDto(booker);
 
         Item item = new Item(1, "carpet", "description", true, null, owner);
-        ItemDto itemDto = ItemMapper.toItemDto(item);
+        itemDto = ItemMapper.toItemDto(item);
 
-        Date dateBeg = getDate("2023-03-29");
-        Date dateEnd = getDate("2023-04-15");
+        dateBeg = getDate("2023-03-29");
+        dateEnd = getDate("2023-04-15");
 
         userService.addUser(ownerDto);
         userService.addUser(bookerDto);
 
         itemService.addItem(1, itemDto);
+
+    }
+
+    @Test
+    public void shouldSuccessBooking() {
 
         BookingDto bookingDto = new BookingDto(null, dateBeg, dateEnd, 1, itemDto, bookerDto, bookerDto.getId(), null);
 
@@ -63,8 +74,8 @@ public class BookServiceIntegTest {
         Booking booking = query.setParameter("item", itemDto.getId()).getSingleResult();
 
         Assertions.assertNotNull(booking.getId());
-        Assertions.assertEquals(booking.getBooker().getId(), booker.getId());
-        Assertions.assertEquals(booking.getItem().getId(), item.getId());
+        Assertions.assertEquals(booking.getBooker().getEmail(), bookerDto.getEmail());
+        Assertions.assertEquals(booking.getItem().getName(), itemDto.getName());
     }
 
     private Date getDate(String stringDate) {
