@@ -49,9 +49,10 @@ public class UserServiceUnitTest {
 
     @Test
     public void shouldFailUpdateUserWithExistsEmail() {
-        User user = new User(1, "new_alina@email.ru", "Adina");
-        Mockito.when(mockUserRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(user));
-        Mockito.when(mockUserRepository.findByEmail(Mockito.anyString())).thenThrow(new IncorrectUserParameterException("Такой email уже существует"));
+        User user0 = new User(1, "new_alina@email.ru", "alina");
+        User user = new User(2, "new_alina@email.ru", "Adina");
+        Mockito.when(mockUserRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(user0));
+        Mockito.when(mockUserRepository.findByEmail(Mockito.anyString())).thenReturn(user);
         UserDto userDto = new UserDto(1, "Alina", "new_alina@email.ru");
 
         IncorrectUserParameterException exception = Assertions.assertThrows(IncorrectUserParameterException.class, () -> userService.updateUser(1, userDto));
