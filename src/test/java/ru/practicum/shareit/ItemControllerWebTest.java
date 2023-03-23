@@ -13,10 +13,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.practicum.shareit.comment.dto.AuthorDto;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.exception.IncorrectItemParameterException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.model.User;
@@ -51,6 +53,7 @@ public class ItemControllerWebTest {
     private void setUp() {
         mockMvc = MockMvcBuilders
                 .standaloneSetup(itemController)
+                .setControllerAdvice(ErrorHandler.class)
                 .build();
 
         itemDto = new ItemDto(1, "коньки", "39 размера", true, null, null, null, null);
@@ -78,6 +81,21 @@ public class ItemControllerWebTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(itemDto.getId()), Integer.class))
                 .andExpect(jsonPath("$.description", is(itemDto.getDescription())));
+    }
+
+    @Test
+    public void shouldFailOnAddItemWithIncorrectParams() throws Exception {
+        Mockito.when(itemService.addItem(Mockito.anyInt(), any()))
+                .thenThrow(new IncorrectItemParameterException("Статус не может быть пустой"));
+
+        mockMvc.perform(post("/items")
+                .header(Variables.USER_ID, 2)
+
+                .content(mapper.writeValueAsString(itemDto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

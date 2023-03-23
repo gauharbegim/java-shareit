@@ -30,12 +30,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleDataIntegrityViolationException(final DataIntegrityViolationException dataIntegrityViolationException) {
-        return new ErrorResponse(dataIntegrityViolationException.getMessage());
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleIncorrectParameterException(final IncorrectItemParameterException e) {
 

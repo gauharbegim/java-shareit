@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.comment.dao.CommentRepository;
@@ -141,6 +142,26 @@ public class ItemServiceUnitTest {
         Mockito.when(mockBookingRepository.findByItem(item)).thenReturn(List.of(booking, booking1, booking2));
 
         List<ItemDto> list = itemService.getItems(owner.getId(), null, null);
+
+        Assertions.assertNotNull(list);
+        Assertions.assertNotNull(list.get(0).getLastBooking());
+        Assertions.assertNotNull(list.get(0).getNextBooking());
+    }
+
+    @Test
+    public void shouldSuccessGetItemsByPage() {
+        Mockito.when(mockUserRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(owner));
+        Mockito.when(mockItemRepository.findByOwner(any(), any())).thenReturn(new PageImpl<>(List.of(item)));
+        dateBeg = getDate("2022-10-29");
+        dateEnd = getDate("2022-11-15");
+        Booking booking1 = new Booking(2, dateBeg, dateEnd, item, booker, "APPROVED");
+
+        dateBeg = getDate("2022-12-29");
+        dateEnd = getDate("2023-01-15");
+        Booking booking2 = new Booking(3, dateBeg, dateEnd, item, booker, "APPROVED");
+        Mockito.when(mockBookingRepository.findByItem(item)).thenReturn(List.of(booking, booking1, booking2));
+
+        List<ItemDto> list = itemService.getItems(owner.getId(), 1, 3);
 
         Assertions.assertNotNull(list);
         Assertions.assertNotNull(list.get(0).getLastBooking());
