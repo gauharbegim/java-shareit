@@ -46,21 +46,21 @@ public class BookServiceIntegTest {
 
     @BeforeEach
     public void setup() {
-        User owner = new User(1, "eee@email.ru", "Eva");
-        UserDto ownerDto = UserMapper.toUserDto(owner);
 
         User booker = new User(2, "ssss@email.ru", "Sasha");
         bookerDto = UserMapper.toUserDto(booker);
+        userService.addUser(bookerDto);
 
-        Item item = new Item(1, "carpet", "description", true, null, owner);
-        itemDto = ItemMapper.toItemDto(item);
 
         dateBeg = getDate("2023-03-29");
         dateEnd = getDate("2023-04-15");
 
-        userService.addUser(ownerDto);
-        userService.addUser(bookerDto);
+        User owner = new User(1, "eee@email.ru", "Eva");
+        UserDto ownerDto = UserMapper.toUserDto(owner);
+        UserDto newOwner = userService.addUser(ownerDto);
 
+        Item item = new Item(1, "carpet", "description", true, null, UserMapper.toUserModel(newOwner));
+        itemDto = ItemMapper.toItemDto(item);
         itemService.addItem(1, itemDto);
     }
 
