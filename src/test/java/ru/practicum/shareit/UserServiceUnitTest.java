@@ -47,12 +47,12 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    public void shouldMapToUserDtoList(){
+    public void shouldMapToUserDtoList() {
         User user1 = new User(1, "1_alina@email.ru", "Adina");
         User user2 = new User(2, "2_alina@email.ru", "Madina");
         User user3 = new User(3, "3_alina@email.ru", "Alina");
 
-        List<User> userList = List.of(user1,user2, user3);
+        List<User> userList = List.of(user1, user2, user3);
         List<UserDto> userDtoList = UserMapper.toUserDtoList(userList);
 
         Assertions.assertEquals(userDtoList.size(), 3);

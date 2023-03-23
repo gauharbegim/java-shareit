@@ -129,7 +129,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getBooking(BookingStatus state, Integer bookerId, Integer from, Integer size) {
         Optional<User> user = userRepository.findById(bookerId);
-        log.info("-----> user:"+user);
+        log.info("-----> user:" + user);
         if (user.isPresent()) {
             List<Booking> bookingList = new ArrayList<>();
             if (from == null && size == null) {
