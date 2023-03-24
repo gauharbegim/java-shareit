@@ -15,6 +15,6 @@ public class ShareItApp {
 
     @PostConstruct
     public void init() {
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Almaty"));
     }
 }

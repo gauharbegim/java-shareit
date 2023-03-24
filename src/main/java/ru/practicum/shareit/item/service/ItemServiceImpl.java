@@ -197,7 +197,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public CommentDto addComment(Integer authorId, Integer itemId, CommentDto commentDto) {
+    public CommentDto addComment(Integer authorId, Integer itemId, CommentDto commentDto)   {
         Optional<User> authorOption = userRepository.findById(authorId);
         if (!authorOption.isPresent()) {
             throw new UserNotFoundException("Автор не найден");
@@ -208,6 +208,8 @@ public class ItemServiceImpl implements ItemService {
         Optional<Item> itemOption = itemRepository.findById(itemId);
         Item item = itemOption.get();
 
+        log.info("----->"+bookingRepository.findByItemAndBooker(item, author));
+        log.info("***** "+new Date());
         List<Booking> authorBooked = bookingRepository.findByItemAndBooker(item, author).stream()
                 .filter(booking -> booking.getStatus().equals("APPROVED"))
                 .filter(booking -> booking.getDateEnd().before(new Date()))
