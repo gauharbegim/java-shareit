@@ -115,7 +115,6 @@ public class ItemServiceImpl implements ItemService {
             if (itemOwnerId.equals(ownerId)) {
                 List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
                         .filter(booking -> booking.getStatus().equals("APPROVED"))
-                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
                 if (itemBookingList.size() == 1) {
                     itemDto.setLastBooking(BookingMapper.toBookingDto(itemBookingList.get(itemBookingList.size() - 1)));
