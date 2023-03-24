@@ -113,9 +113,14 @@ public class ItemServiceImpl implements ItemService {
             ItemDto itemDto = ItemMapper.toItemDto(item);
             Integer itemOwnerId = item.getOwner().getId();
             if (itemOwnerId.equals(ownerId)) {
+                log.info("****************************");
+                log.info("+++++++++++++++itemBookingList: {}",bookingRepository.findByItem(item));
                 List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
                         .filter(booking -> booking.getStatus().equals("APPROVED"))
+                        .sorted((a,b) -> Math.toIntExact(b.getDateBegin().toInstant().getEpochSecond() - a.getDateBegin().toInstant().getEpochSecond()))
                         .collect(Collectors.toList());
+                log.info("-------> sorted itemBookingList: {}",itemBookingList);
+                log.info("****************************");
                 if (itemBookingList.size() == 1) {
                     itemDto.setLastBooking(BookingMapper.toBookingDto(itemBookingList.get(itemBookingList.size() - 1)));
                 } else if (itemBookingList.size() > 1) {
