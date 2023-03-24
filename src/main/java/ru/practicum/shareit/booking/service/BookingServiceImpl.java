@@ -118,11 +118,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void checkDates(BookingDto bookingDto) {
-        if (bookingDto.getEnd() == null || bookingDto.getStart() == null){
-            throw new IncorrectBookingParameterException("Неверные параметры");
-        }
-
-        if (bookingDto.getEnd().before(bookingDto.getStart())
+        if (bookingDto.getEnd() == null || bookingDto.getStart() == null
+                || bookingDto.getEnd().equals(bookingDto.getStart())
+                || bookingDto.getEnd().before(bookingDto.getStart())
                 || bookingDto.getEnd().before(new Date())
                 || bookingDto.getStart().before(new Date())
         ) {
