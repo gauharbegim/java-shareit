@@ -119,10 +119,8 @@ public class ItemServiceImpl implements ItemService {
                 itemDto.setNextBooking(getNextBooking(item));
             }
             List<CommentDto> commentList = getComment(item);
-            log.info("-----> " + commentList);
             itemDto.setComments(commentList);
 
-            log.info("****************************");
             return itemDto;
         } else {
             throw new IncorrectParameterException("Item не найден");
@@ -145,7 +143,7 @@ public class ItemServiceImpl implements ItemService {
     private BookingDto getNextBooking(Item item) {
         List<Booking> itemBookingListNext = bookingRepository.findByItem(item).stream()
                 .filter(booking -> booking.getDateBegin().after(new Date()) && booking.getStatus().equals("APPROVED"))
-                .sorted((a, b) -> Math.toIntExact(b.getDateBegin().toInstant().getEpochSecond() - a.getDateBegin().toInstant().getEpochSecond()))
+                .sorted((a, b) -> Math.toIntExact(a.getDateBegin().toInstant().getEpochSecond() - b.getDateBegin().toInstant().getEpochSecond()))
                 .collect(Collectors.toList());
         if (itemBookingListNext.size() > 0) {
             return BookingMapper.toBookingDto(itemBookingListNext.get(0));
