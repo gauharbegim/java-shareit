@@ -3,10 +3,6 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -143,9 +139,9 @@ public class BookingServiceImpl implements BookingService {
             if (from == null && size == null) {
                 bookingList = bookingRepository.findByBooker(user.get());
             } else if (from >= 0 && size > 0) {
-                Sort sortById = Sort.by(Sort.Direction.ASC, "id");
-                Pageable page = PageRequest.of(from, size, sortById);
-                bookingList = bookingRepository.findByBookerByPage(user.get(), from, size);
+//                Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+//                Pageable page = PageRequest.of(from, size, sortById);
+                bookingList = bookingRepository.findByBookerByPage(user.get().getId(), from, size);
             } else {
                 throw new IncorrectBookingParameterException("Неверные параметры");
             }
@@ -206,22 +202,26 @@ public class BookingServiceImpl implements BookingService {
         Optional<User> user = userRepository.findById(ownerId);
         if (user.isPresent()) {
             List<Item> ownerItemList = itemRepository.findByOwner(user.get());
+            log.info("****** ownerItemList:{}", ownerItemList);
             List<Booking> bookingList = new ArrayList<>();
             ownerItemList.stream().forEach(item -> {
                         List<Booking> itemBookingList = new ArrayList<>();
+                        log.info(" ||||||******* " + bookingRepository.findByItem(item));
                         if (from == null && size == null) {
                             itemBookingList = bookingRepository.findByItem(item);
                         } else if (from >= 0 && size > 0) {
-                            Sort sortById = Sort.by(Sort.Direction.ASC, "id");
-                            Pageable page = PageRequest.of(from, size, sortById);
-                            Page<Booking> bookingPage = bookingRepository.findByItem(item, page);
-                            itemBookingList = bookingPage.getContent();
+//                            Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+//                            Pageable page = PageRequest.of(from, size, sortById);
+
+                            itemBookingList = bookingRepository.findByItemByLimits(item.getId(), from, size);
+//                            itemBookingList = bookingPage.getContent();
                         } else {
                             throw new IncorrectBookingParameterException("Неверные параметры");
                         }
                         bookingList.addAll(itemBookingList);
                     }
             );
+            log.info("---- bookingList:{}", bookingList);
             List<Booking> list = getBookingListByStatus(state, bookingList);
             return BookingMapper.toBookingDtoList(list);
         } else {

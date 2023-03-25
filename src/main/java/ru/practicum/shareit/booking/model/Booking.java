@@ -23,6 +23,7 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     private Date dateBegin;
     private Date dateEnd;
 
