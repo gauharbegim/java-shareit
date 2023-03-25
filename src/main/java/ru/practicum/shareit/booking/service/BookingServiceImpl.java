@@ -139,13 +139,13 @@ public class BookingServiceImpl implements BookingService {
         log.info("-----> user:" + user);
         if (user.isPresent()) {
             List<Booking> bookingList = new ArrayList<>();
+            log.info("----------> all bookings of usr: " + bookingRepository.findByBooker(user.get()));
             if (from == null && size == null) {
                 bookingList = bookingRepository.findByBooker(user.get());
             } else if (from >= 0 && size > 0) {
                 Sort sortById = Sort.by(Sort.Direction.ASC, "id");
                 Pageable page = PageRequest.of(from, size, sortById);
-                Page<Booking> bookingPage = bookingRepository.findByBooker(user.get(), page);
-                bookingList = bookingPage.getContent();
+                bookingList = bookingRepository.findByBookerByPage(user.get(), from, size);
             } else {
                 throw new IncorrectBookingParameterException("Неверные параметры");
             }
