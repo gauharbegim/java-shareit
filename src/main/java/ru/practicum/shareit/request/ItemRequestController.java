@@ -34,8 +34,9 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
-    public List<ItemRequestDto> getRequests(@RequestParam(required = false, name = "from") Integer from,
+    public List<ItemRequestDto> getRequests(@RequestHeader(value = Variables.USER_ID) Integer owner,
+                                            @RequestParam(required = false, name = "from") Integer from,
                                             @RequestParam(required = false, name = "size") Integer size) {
-        return itemRequestService.getItemRequests(from, size);
+        return itemRequestService.getItemRequests(owner, from, size);
     }
 }

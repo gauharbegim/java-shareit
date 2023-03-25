@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.exception.BookingNotFoundException;
 import ru.practicum.shareit.booking.exception.IncorrectBookingParameterException;
 import ru.practicum.shareit.item.exception.IncorrectItemParameterException;
 import ru.practicum.shareit.item.exception.IncorrectParameterException;
+import ru.practicum.shareit.request.exception.IncorrectPageParametrException;
 import ru.practicum.shareit.request.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.user.exceptions.IncorrectUserParameterException;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
@@ -23,6 +24,12 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIncorrectPageParameterException(final IncorrectPageParametrException incorrectPageParametrException) {
+        return new ErrorResponse(incorrectPageParametrException.getMessage());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleIncorrectUserParameterException(final IncorrectUserParameterException incorrectUserParameterException) {
         return new ErrorResponse(incorrectUserParameterException.getMessage());
@@ -30,14 +37,14 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIncorrectParameterException(final IncorrectItemParameterException e) {
+    public ErrorResponse handleIncorrectItemParameterException(final IncorrectItemParameterException e) {
 
         return new ErrorResponse("Unknown state: " + e.getParameter());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIncorrectParameterException(final IncorrectBookingParameterException incorrectBookingParameterException) {
+    public ErrorResponse handleIncorrectBookingParameterException(final IncorrectBookingParameterException incorrectBookingParameterException) {
         return new ErrorResponse(incorrectBookingParameterException.getMessage());
     }
 

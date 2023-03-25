@@ -5,13 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.exception.IncorrectParameterException;
 import ru.practicum.shareit.request.dao.ItemRequestRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
-import ru.practicum.shareit.request.exception.ItemRequestNotFoundException;
+import ru.practicum.shareit.request.exception.IncorrectPageParametrException;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.service.ItemRequestService;
@@ -74,9 +72,10 @@ public class RequestServiceUnitTest {
         ItemRequest request1 = new ItemRequest(1, "костюм клоуна", requestor, getDate("2023-01-15"));
         ItemRequest request2 = new ItemRequest(2, "Платье ретро", requestor, getDate("2023-03-15"));
         ItemRequest request3 = new ItemRequest(3, "Костюм микки-маус", requestor, getDate("2023-03-01"));
-        Mockito.when(mockItemRequestRepository.findAll((Pageable) Mockito.any())).thenReturn(new PageImpl<>(List.of(request1, request2, request3)));
+        Mockito.when(mockUserRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(requestor));
+        Mockito.when(mockItemRequestRepository.findByRequestorLimits(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(List.of(request1, request2, request3));
 
-        List<ItemRequestDto> list = requestService.getItemRequests(1, 2);
+        List<ItemRequestDto> list = requestService.getItemRequests(1, 1, 2);
 
         Assertions.assertEquals(list.get(0).getCreated(), request1.getCreated());
         Assertions.assertEquals(list.get(1).getCreated(), request3.getCreated());
@@ -91,13 +90,13 @@ public class RequestServiceUnitTest {
         ItemRequest request3 = new ItemRequest(3, "Костюм микки-маус", requestor, getDate("2023-03-01"));
         Mockito.when(mockItemRequestRepository.findAll()).thenReturn(List.of(request1, request2, request3));
 
-        ItemRequestNotFoundException exception = Assertions.assertThrows(ItemRequestNotFoundException.class,
-                () -> requestService.getItemRequests(-1, -1)
+        IncorrectPageParametrException exception = Assertions.assertThrows(IncorrectPageParametrException.class,
+                () -> requestService.getItemRequests(requestor.getId(), -1, -1)
         );
 
         Assertions.assertNotNull(exception);
 
-        List<ItemRequestDto> lsitItems = requestService.getItemRequests(null, null);
+        List<ItemRequestDto> lsitItems = requestService.getItemRequests(null, null, null);
         Assertions.assertNotNull(lsitItems);
         Assertions.assertEquals(lsitItems.size(), 3);
 

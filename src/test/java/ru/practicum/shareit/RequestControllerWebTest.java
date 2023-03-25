@@ -87,10 +87,11 @@ public class RequestControllerWebTest {
 
     @Test
     public void shouldSuccessGetRequests() throws Exception {
-        Mockito.when(requestService.getItemRequests(Mockito.anyInt(), Mockito.anyInt())).thenReturn(List.of(requestDto));
+        Mockito.when(requestService.getItemRequests(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(List.of(requestDto));
 
         mockMvc.perform(get("/requests/all")
                 .characterEncoding(StandardCharsets.UTF_8)
+                .header(Variables.USER_ID, 2)
                 .param("from", "1")
                 .param("size", "2")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -102,12 +103,10 @@ public class RequestControllerWebTest {
 
     @Test
     public void shouldFailGetRequestsByPage() throws Exception {
-        Mockito.when(requestService.getItemRequests(Mockito.anyInt(), Mockito.anyInt())).thenThrow(new ItemRequestNotFoundException("Неверные параметры"));
-
         mockMvc.perform(get("/requests/all")
                 .characterEncoding(StandardCharsets.UTF_8)
-                .param("from", "1")
-                .param("size", "2")
+                .param("from", "0")
+                .param("size", "0")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());

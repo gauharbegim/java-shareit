@@ -3,10 +3,6 @@ package ru.practicum.shareit.request.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dao.ItemRepository;
 
@@ -15,6 +11,7 @@ import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dao.ItemRequestRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.exception.IncorrectPageParametrException;
 import ru.practicum.shareit.request.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
@@ -93,24 +90,25 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDto> getItemRequests(Integer from, Integer size) {
+    public List<ItemRequestDto> getItemRequests(Integer owner, Integer from, Integer size) {
         List<ItemRequest> itemRequestList = new ArrayList<>();
         if (from == null || size == null) {
             itemRequestList = requestRepository.findAll();
             return ItemRequestMapper.toItemRequestDtoList(itemRequestList);
-        } else if (from < 0 || size < 0) {
-            throw new ItemRequestNotFoundException("Неверные параметры");
+        } else if (from < 0 || size <= 0) {
+            throw new IncorrectPageParametrException("Неверные параметры");
         } else {
-            Sort sortById = Sort.by(Sort.Direction.ASC, "id");
-            Pageable page = PageRequest.of(from, size, sortById);
-            Page<ItemRequest> itemRequestPage = requestRepository.findAll(page);
-            List<ItemRequestDto> itemRequestDtoList = null;
-            if (itemRequestPage != null) {
-                itemRequestList = itemRequestPage.getContent();
-                itemRequestDtoList = ItemRequestMapper.toItemRequestDtoList(itemRequestList);
-                addItems(itemRequestDtoList);
-                itemRequestDtoList = sortItemRequestList(itemRequestDtoList);
-            }
+//            Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+//            Pageable page = PageRequest.of(from, size, sortById);
+            User requestor = getRequestorUser(owner);
+            itemRequestList = requestRepository.findByRequestorLimits(requestor.getId(), from, size);
+//            List<ItemRequestDto> itemRequestDtoList = null;
+//            if (itemRequestPage != null) {
+//                itemRequestList = itemRequestPage.getContent();
+            List<ItemRequestDto> itemRequestDtoList = ItemRequestMapper.toItemRequestDtoList(itemRequestList);
+            addItems(itemRequestDtoList);
+            itemRequestDtoList = sortItemRequestList(itemRequestDtoList);
+//            }
             return itemRequestDtoList;
         }
 
