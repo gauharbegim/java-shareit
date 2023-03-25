@@ -76,7 +76,7 @@ public class BookingServiceImpl implements BookingService {
             }
             booking.setDateBegin(bookingDto.getStart());
             booking.setDateEnd(bookingDto.getEnd());
-            log.info("start"+bookingDto.getStart());
+            log.info("start" + bookingDto.getStart());
             booking.setItem(item.get());
             booking.setStatus("WAITING");
 
