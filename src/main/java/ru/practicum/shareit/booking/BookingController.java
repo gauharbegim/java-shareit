@@ -33,6 +33,7 @@ public class BookingController {
     @PostMapping
     public BookingDto booking(@RequestHeader(value = Variables.USER_ID) Integer bookerId,
                               @Valid @RequestBody @NotNull BookingDto bookingDto) {
+        log.info("----> start:{} end:{}",bookingDto.getStart(), bookingDto.getEnd());
         return bookingService.booking(bookerId, bookingDto);
     }
 

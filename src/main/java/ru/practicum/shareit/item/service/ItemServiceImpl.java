@@ -25,6 +25,7 @@ import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
 import java.util.Comparator;
@@ -120,7 +121,6 @@ public class ItemServiceImpl implements ItemService {
                         .sorted((a,b) -> Math.toIntExact(b.getDateBegin().toInstant().getEpochSecond() - a.getDateBegin().toInstant().getEpochSecond()))
                         .collect(Collectors.toList());
                 log.info("-------> sorted itemBookingList: {}",itemBookingList);
-                log.info("****************************");
                 if (itemBookingList.size() == 1) {
                     itemDto.setLastBooking(BookingMapper.toBookingDto(itemBookingList.get(itemBookingList.size() - 1)));
                 } else if (itemBookingList.size() > 1) {
@@ -137,7 +137,10 @@ public class ItemServiceImpl implements ItemService {
                 }
             }
             List<CommentDto> commentList = getComment(item);
+            log.info("-----> " + commentList);
             itemDto.setComments(commentList);
+
+            log.info("****************************");
             return itemDto;
         } else {
             throw new IncorrectParameterException("Item не найден");
@@ -211,6 +214,9 @@ public class ItemServiceImpl implements ItemService {
         Optional<Item> itemOption = itemRepository.findById(itemId);
         Item item = itemOption.get();
 
+        log.info("*****----"+bookingRepository.findByItemAndBooker(item, author));
+        log.info("*****----"+new Date());
+        log.info("*****----"+ LocalDateTime.now());
         List<Booking> authorBooked = bookingRepository.findByItemAndBooker(item, author).stream()
                 .filter(booking -> booking.getStatus().equals("APPROVED"))
                 .filter(booking -> booking.getDateEnd().before(new Date()))

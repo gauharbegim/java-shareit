@@ -56,6 +56,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto booking(Integer bookerId, BookingDto bookingDto) {
+        log.info("*********************************************************************");
+        log.info("bookingDto:{}", bookingDto);
         checkDates(bookingDto);
 
         Optional<Item> item = itemRepository.findById(bookingDto.getItemId());
@@ -74,11 +76,14 @@ public class BookingServiceImpl implements BookingService {
             }
             booking.setDateBegin(bookingDto.getStart());
             booking.setDateEnd(bookingDto.getEnd());
+            log.info("start"+bookingDto.getStart());
             booking.setItem(item.get());
             booking.setStatus("WAITING");
 
             bookingRepository.save(booking);
 
+            log.info("after save" + bookingRepository.findById(booking.getId()));
+            log.info("*********************************************************************");
             return BookingMapper.toBookingDto(booking);
 
         } else if (!item.isPresent()) {
