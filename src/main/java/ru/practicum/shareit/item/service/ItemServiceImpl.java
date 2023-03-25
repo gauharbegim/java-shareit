@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dao.BookingRepository;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.comment.dao.CommentRepository;
@@ -114,27 +115,8 @@ public class ItemServiceImpl implements ItemService {
             ItemDto itemDto = ItemMapper.toItemDto(item);
             Integer itemOwnerId = item.getOwner().getId();
             if (itemOwnerId.equals(ownerId)) {
-                log.info("****************************");
-                log.info("+++++++++++++++itemBookingList: {}", bookingRepository.findByItem(item));
-                List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
-                        .filter(booking -> booking.getStatus().equals("APPROVED"))
-                        .sorted((a, b) -> Math.toIntExact(b.getDateBegin().toInstant().getEpochSecond() - a.getDateBegin().toInstant().getEpochSecond()))
-                        .collect(Collectors.toList());
-                log.info("-------> sorted itemBookingList: {}", itemBookingList);
-                if (itemBookingList.size() == 1) {
-                    itemDto.setLastBooking(BookingMapper.toBookingDto(itemBookingList.get(itemBookingList.size() - 1)));
-                } else if (itemBookingList.size() > 1) {
-                    itemDto.setLastBooking(BookingMapper.toBookingDto(itemBookingList.get(itemBookingList.size() - 1)));
-
-                    List<Booking> itemBookingListNext = itemBookingList.stream()
-                            .filter(booking -> booking.getDateBegin().after(new Date()) && booking.getStatus().equals("APPROVED"))
-                            .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                            .collect(Collectors.toList());
-
-                    if (itemBookingListNext.size() > 1) {
-                        itemDto.setNextBooking(BookingMapper.toBookingDto(itemBookingListNext.get(1)));
-                    }
-                }
+                itemDto.setLastBooking(getLastBooking(item));
+                itemDto.setNextBooking(getNextBooking(item));
             }
             List<CommentDto> commentList = getComment(item);
             log.info("-----> " + commentList);
@@ -146,6 +128,32 @@ public class ItemServiceImpl implements ItemService {
             throw new IncorrectParameterException("Item не найден");
         }
     }
+
+    private BookingDto getLastBooking(Item item) {
+        List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
+                .filter(booking -> (booking.getDateBegin().before(new Date()) || booking.getDateBegin().equals(new Date())) && booking.getStatus().equals("APPROVED"))
+                .filter(booking -> booking.getStatus().equals("APPROVED"))
+                .sorted((a, b) -> Math.toIntExact(b.getDateBegin().toInstant().getEpochSecond() - a.getDateBegin().toInstant().getEpochSecond()))
+                .collect(Collectors.toList());
+        if (itemBookingList.size() > 0) {
+            return BookingMapper.toBookingDto(itemBookingList.get(0));
+        } else {
+            return null;
+        }
+    }
+
+    private BookingDto getNextBooking(Item item) {
+        List<Booking> itemBookingListNext = bookingRepository.findByItem(item).stream()
+                .filter(booking -> booking.getDateBegin().after(new Date()) && booking.getStatus().equals("APPROVED"))
+                .sorted((a, b) -> Math.toIntExact(b.getDateBegin().toInstant().getEpochSecond() - a.getDateBegin().toInstant().getEpochSecond()))
+                .collect(Collectors.toList());
+        if (itemBookingListNext.size() > 0) {
+            return BookingMapper.toBookingDto(itemBookingListNext.get(0));
+        } else {
+            return null;
+        }
+    }
+
 
     @Override
     public List<ItemDto> getItems(Integer ownerId, Integer from, Integer size) {

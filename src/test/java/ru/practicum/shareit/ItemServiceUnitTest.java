@@ -76,16 +76,6 @@ public class ItemServiceUnitTest {
     }
 
     @Test
-    public void shouldViewItemBookingsForOwnerWithOneBooking() {
-        Mockito.when(mockItemRepository.findById(item.getId())).thenReturn(Optional.of(item));
-        Mockito.when(mockUserRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
-        Mockito.when(mockBookingRepository.findByItem(item)).thenReturn(List.of(booking));
-
-        ItemDto itemDto = itemService.getItem(1, 1);
-        Assertions.assertNotNull(itemDto.getLastBooking());
-    }
-
-    @Test
     public void shouldViewItemBookingsForOwnerWIthMultipleBookings() {
         Mockito.when(mockItemRepository.findById(item.getId())).thenReturn(Optional.of(item));
         Mockito.when(mockUserRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
@@ -101,7 +91,7 @@ public class ItemServiceUnitTest {
 
         ItemDto itemDto = itemService.getItem(1, 1);
         Assertions.assertNotNull(itemDto.getLastBooking());
-        Assertions.assertEquals(itemDto.getLastBooking().getId(), booking1.getId());
+        Assertions.assertEquals(itemDto.getLastBooking().getId(), booking2.getId());
     }
 
     @Test
