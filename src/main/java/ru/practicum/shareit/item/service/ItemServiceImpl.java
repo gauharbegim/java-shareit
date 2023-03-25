@@ -176,9 +176,8 @@ public class ItemServiceImpl implements ItemService {
                     .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                     .collect(Collectors.toList());
             if (itemBookingList.size() > 0) {
-                itemDto.setLastBooking(BookingMapper.toBookingDto(itemBookingList.get(itemBookingList.size() - 1)));
-                itemDto.setNextBooking(BookingMapper.toBookingDto(itemBookingList.get(itemBookingList.size() - 2)));
-
+                itemDto.setLastBooking(getLastBooking(item));
+                itemDto.setNextBooking(getNextBooking(item));
             }
             itemDtoList.add(itemDto);
         });
