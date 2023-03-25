@@ -18,11 +18,11 @@ import java.util.Date;
 public class BookingDto {
     private Integer id;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Almaty")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @FutureOrPresent
     private Date start;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Almaty")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @FutureOrPresent
     private Date end;
 
