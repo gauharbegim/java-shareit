@@ -2,7 +2,6 @@ package ru.practicum.shareit.booking.service;
 
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
@@ -52,8 +50,6 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto booking(Integer bookerId, BookingDto bookingDto) {
-        log.info("*********************************************************************");
-        log.info("bookingDto:{}", bookingDto);
         checkDates(bookingDto);
 
         Optional<Item> item = itemRepository.findById(bookingDto.getItemId());
@@ -72,14 +68,11 @@ public class BookingServiceImpl implements BookingService {
             }
             booking.setDateBegin(bookingDto.getStart());
             booking.setDateEnd(bookingDto.getEnd());
-            log.info("start" + bookingDto.getStart());
             booking.setItem(item.get());
             booking.setStatus("WAITING");
 
             bookingRepository.save(booking);
 
-            log.info("after save" + bookingRepository.findById(booking.getId()));
-            log.info("*********************************************************************");
             return BookingMapper.toBookingDto(booking);
 
         } else if (!item.isPresent()) {
@@ -132,15 +125,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getBooking(BookingStatus state, Integer bookerId, Integer from, Integer size) {
         Optional<User> user = userRepository.findById(bookerId);
-        log.info("-----> user:" + user);
         if (user.isPresent()) {
             List<Booking> bookingList = new ArrayList<>();
-            log.info("----------> all bookings of usr: " + bookingRepository.findByBooker(user.get()));
             if (from == null && size == null) {
                 bookingList = bookingRepository.findByBooker(user.get());
             } else if (from >= 0 && size > 0) {
-//                Sort sortById = Sort.by(Sort.Direction.ASC, "id");
-//                Pageable page = PageRequest.of(from, size, sortById);
                 bookingList = bookingRepository.findByBookerByPage(user.get().getId(), from, size);
             } else {
                 throw new IncorrectBookingParameterException("Неверные параметры");
@@ -202,26 +191,19 @@ public class BookingServiceImpl implements BookingService {
         Optional<User> user = userRepository.findById(ownerId);
         if (user.isPresent()) {
             List<Item> ownerItemList = itemRepository.findByOwner(user.get());
-            log.info("****** ownerItemList:{}", ownerItemList);
             List<Booking> bookingList = new ArrayList<>();
             ownerItemList.stream().forEach(item -> {
                         List<Booking> itemBookingList = new ArrayList<>();
-                        log.info(" ||||||******* " + bookingRepository.findByItem(item));
                         if (from == null && size == null) {
                             itemBookingList = bookingRepository.findByItem(item);
                         } else if (from >= 0 && size > 0) {
-//                            Sort sortById = Sort.by(Sort.Direction.ASC, "id");
-//                            Pageable page = PageRequest.of(from, size, sortById);
-
                             itemBookingList = bookingRepository.findByItemByLimits(item.getId(), from, size);
-//                            itemBookingList = bookingPage.getContent();
                         } else {
                             throw new IncorrectBookingParameterException("Неверные параметры");
                         }
                         bookingList.addAll(itemBookingList);
                     }
             );
-            log.info("---- bookingList:{}", bookingList);
             List<Booking> list = getBookingListByStatus(state, bookingList);
             return BookingMapper.toBookingDtoList(list);
         } else {

@@ -1,11 +1,8 @@
 package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dao.ItemRepository;
-
 import ru.practicum.shareit.item.exception.IncorrectParameterException;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
@@ -23,7 +20,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository requestRepository;
@@ -72,7 +68,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
             return itemRequestDto;
         } else {
-            log.info("-------------Запрос не найден--------");
             throw new IncorrectParameterException("Запрос не найден");
         }
     }
@@ -98,17 +93,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         } else if (from < 0 || size <= 0) {
             throw new IncorrectPageParametrException("Неверные параметры");
         } else {
-//            Sort sortById = Sort.by(Sort.Direction.ASC, "id");
-//            Pageable page = PageRequest.of(from, size, sortById);
             User requestor = getRequestorUser(owner);
             itemRequestList = requestRepository.findByRequestorLimits(requestor.getId(), from, size);
-//            List<ItemRequestDto> itemRequestDtoList = null;
-//            if (itemRequestPage != null) {
-//                itemRequestList = itemRequestPage.getContent();
             List<ItemRequestDto> itemRequestDtoList = ItemRequestMapper.toItemRequestDtoList(itemRequestList);
             addItems(itemRequestDtoList);
             itemRequestDtoList = sortItemRequestList(itemRequestDtoList);
-//            }
             return itemRequestDtoList;
         }
 

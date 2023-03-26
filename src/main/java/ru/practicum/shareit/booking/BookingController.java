@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +22,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/bookings")
-@Slf4j
 public class BookingController {
     @Autowired
     private BookingService bookingService;
@@ -33,7 +31,6 @@ public class BookingController {
     @PostMapping
     public BookingDto booking(@RequestHeader(value = Variables.USER_ID) Integer bookerId,
                               @Valid @RequestBody @NotNull BookingDto bookingDto) {
-        log.info("----> start:{} end:{}",bookingDto.getStart(), bookingDto.getEnd());
         return bookingService.booking(bookerId, bookingDto);
     }
 

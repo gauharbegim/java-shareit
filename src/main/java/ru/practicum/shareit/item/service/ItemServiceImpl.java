@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +25,6 @@ import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
 import java.util.Comparator;
@@ -36,7 +34,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 @Transactional
 public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
@@ -219,9 +216,6 @@ public class ItemServiceImpl implements ItemService {
         Optional<Item> itemOption = itemRepository.findById(itemId);
         Item item = itemOption.get();
 
-        log.info("*****----" + bookingRepository.findByItemAndBooker(item, author));
-        log.info("*****----" + new Date());
-        log.info("*****----" + LocalDateTime.now());
         List<Booking> authorBooked = bookingRepository.findByItemAndBooker(item, author).stream()
                 .filter(booking -> booking.getStatus().equals("APPROVED"))
                 .filter(booking -> booking.getDateEnd().before(new Date()))
