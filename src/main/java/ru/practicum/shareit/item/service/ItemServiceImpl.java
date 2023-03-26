@@ -165,7 +165,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
         List<ItemDto> itemDtoList = new ArrayList<>();
-        itemList.stream().forEach(item -> {
+        itemList.forEach(item -> {
             ItemDto itemDto = ItemMapper.toItemDto(item);
             List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
                     .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
@@ -222,7 +222,6 @@ public class ItemServiceImpl implements ItemService {
                 .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                 .collect(Collectors.toList());
 
-
         if (authorBooked.isEmpty()) {
             throw new IncorrectItemParameterException("Неверные параметры");
         }
@@ -230,7 +229,6 @@ public class ItemServiceImpl implements ItemService {
         Comment comment = new Comment();
         comment.setAuthor(author);
         comment.setDateCreated(new Date());
-
         comment.setItem(item);
         comment.setText(commentDto.getText());
         commentRepository.save(comment);

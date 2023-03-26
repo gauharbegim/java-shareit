@@ -192,7 +192,7 @@ public class BookingServiceImpl implements BookingService {
         if (user.isPresent()) {
             List<Item> ownerItemList = itemRepository.findByOwner(user.get());
             List<Booking> bookingList = new ArrayList<>();
-            ownerItemList.stream().forEach(item -> {
+            ownerItemList.forEach(item -> {
                         List<Booking> itemBookingList = new ArrayList<>();
                         if (from == null && size == null) {
                             itemBookingList = bookingRepository.findByItem(item);

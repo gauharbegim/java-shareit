@@ -45,13 +45,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     private User getRequestorUser(Integer userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
-        if (!optionalUser.isPresent()) {
-            throw new UserNotFoundException("Пользователь не найден");
-        }
-
-        User user = optionalUser.get();
-
-        return user;
+        return optionalUser.orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
     }
 
     @Override
@@ -111,11 +105,10 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     private List<ItemRequestDto> addItems(List<ItemRequestDto> itemRequestDtoList) {
-        itemRequestDtoList.stream()
-                .forEach(requestDto -> {
-                    List<Item> itemList = itemRepository.findByRequestId(requestDto.getId());
-                    requestDto.setItems(ItemMapper.toItemDtoList(itemList));
-                });
+        itemRequestDtoList.forEach(requestDto -> {
+            List<Item> itemList = itemRepository.findByRequestId(requestDto.getId());
+            requestDto.setItems(ItemMapper.toItemDtoList(itemList));
+        });
         return itemRequestDtoList;
     }
 }
