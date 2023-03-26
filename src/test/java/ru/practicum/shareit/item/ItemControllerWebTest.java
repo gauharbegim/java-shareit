@@ -1,8 +1,7 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.item;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,9 +12,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ru.practicum.shareit.ErrorHandler;
 import ru.practicum.shareit.comment.dto.AuthorDto;
 import ru.practicum.shareit.comment.dto.CommentDto;
-import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.exception.IncorrectItemParameterException;
 import ru.practicum.shareit.item.model.Item;
@@ -34,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-@Slf4j
 public class ItemControllerWebTest {
     @Mock
     ItemService itemService;

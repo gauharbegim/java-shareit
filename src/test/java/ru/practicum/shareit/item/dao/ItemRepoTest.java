@@ -1,4 +1,4 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.item.dao;
 
 
 import org.junit.jupiter.api.Assertions;
@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.model.User;
@@ -14,10 +13,10 @@ import ru.practicum.shareit.user.model.User;
 @DataJpaTest
 public class ItemRepoTest {
     @Autowired
-    ItemRepository repository;
+    private ItemRepository repository;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @BeforeEach
     public void setup() {

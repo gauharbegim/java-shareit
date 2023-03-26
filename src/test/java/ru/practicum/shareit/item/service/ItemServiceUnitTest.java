@@ -1,4 +1,4 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.item.service;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -17,8 +17,6 @@ import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.exception.IncorrectItemParameterException;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.item.service.ItemServiceImpl;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
@@ -32,19 +30,19 @@ import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceUnitTest {
-    Date dateBeg = getDate("2023-03-29");
-    Date dateEnd = getDate("2023-04-15");
+    private Date dateBeg = getDate("2023-03-29");
+    private Date dateEnd = getDate("2023-04-15");
 
-    BookingRepository mockBookingRepository = Mockito.mock(BookingRepository.class);
-    UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
-    ItemRepository mockItemRepository = Mockito.mock(ItemRepository.class);
-    CommentRepository mockCommentRepository = Mockito.mock(CommentRepository.class);
+    private final BookingRepository mockBookingRepository = Mockito.mock(BookingRepository.class);
+    private final UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
+    private final ItemRepository mockItemRepository = Mockito.mock(ItemRepository.class);
+    private final CommentRepository mockCommentRepository = Mockito.mock(CommentRepository.class);
 
-    User owner = new User(1, "eee@email.ru", "Eva");
-    Item item = new Item(1, "carpet", "description", true, null, owner);
+    private final User owner = new User(1, "eee@email.ru", "Eva");
+    private final Item item = new Item(1, "carpet", "description", true, null, owner);
 
-    User booker = new User(2, "ppp@email.ru", "Polina");
-    Booking booking = new Booking(1, dateBeg, dateEnd, item, booker, "APPROVED");
+    private final User booker = new User(2, "ppp@email.ru", "Polina");
+    private final Booking booking = new Booking(1, dateBeg, dateEnd, item, booker, "APPROVED");
 
     private final ItemService itemService = new ItemServiceImpl(mockUserRepository, mockBookingRepository, mockItemRepository, mockCommentRepository);
 

@@ -1,7 +1,6 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.practicum.shareit.user.UserController;
+import ru.practicum.shareit.ErrorHandler;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.exceptions.IncorrectUserParameterException;
 import ru.practicum.shareit.user.service.UserService;
@@ -27,17 +26,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-@Slf4j
 public class UserControllerWebTest {
     @Mock
-    UserService userService;
+    private UserService userService;
 
     @InjectMocks
-    UserController userController;
+    private UserController userController;
 
     private final ObjectMapper mapper = new ObjectMapper();
     private MockMvc mockMvc;
-
     private UserDto userDto;
 
     @BeforeEach

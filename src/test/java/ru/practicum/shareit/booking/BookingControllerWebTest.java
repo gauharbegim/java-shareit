@@ -1,7 +1,6 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.booking;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
 
 import static org.mockito.ArgumentMatchers.any;
 
@@ -16,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.ErrorHandler;
 import ru.practicum.shareit.booking.BookingController;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingStatus;
@@ -46,20 +46,18 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 
 @ExtendWith(MockitoExtension.class)
-@Slf4j
 public class BookingControllerWebTest {
     @Mock
-    BookingService bookingService;
+    private BookingService bookingService;
 
     @InjectMocks
-    BookingController bookingController;
-
-    private final ObjectMapper mapper = new ObjectMapper();
+    private BookingController bookingController;
 
     @Autowired
     private MockMvc mockMvc;
 
     private BookingDto bookingDto;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
     private void setUp() {

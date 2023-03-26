@@ -1,4 +1,4 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.user.service;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -11,15 +11,13 @@ import ru.practicum.shareit.user.exceptions.IncorrectUserParameterException;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceUnitTest {
-    UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
-
+    private UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
     private final UserServiceImpl userService = new UserServiceImpl(mockUserRepository);
 
     @Test

@@ -1,8 +1,7 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.booking.service;
 
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
@@ -26,7 +24,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@Slf4j
 @SpringBootTest(
         properties = "db.name=test",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -37,10 +34,10 @@ public class BookServiceIntegTest {
     private final UserService userService;
     private final ItemService itemService;
 
-    Date dateBeg = null;
-    Date dateEnd = null;
-    ItemDto itemDto = null;
-    UserDto bookerDto = null;
+    private Date dateBeg = null;
+    private Date dateEnd = null;
+    private ItemDto itemDto = null;
+    private UserDto bookerDto = null;
 
     @BeforeEach
     public void setup() {

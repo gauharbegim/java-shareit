@@ -1,20 +1,17 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
-import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.Date;
 
-@Slf4j
 @SpringBootTest(
         properties = "db.name=test",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)

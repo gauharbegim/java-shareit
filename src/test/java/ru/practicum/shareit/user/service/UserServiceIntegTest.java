@@ -1,18 +1,15 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
-import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
 
-@Slf4j
 @SpringBootTest(
         properties = "db.name=test",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -39,13 +36,14 @@ public class UserServiceIntegTest {
     @Test
     public void shouldSuccessGetRequwstList() {
         UserDto user = new UserDto(null, "Masha", "mmm@mail.ru");
-        userService.addUser(user);
+        user = userService.addUser(user);
 
-        UserDto user2 = new UserDto(null, "Natasha", "nnn@mail.ru");
-        userService.addUser(user2);
+        UserDto user2 = new UserDto(null, "Natasha", "natasha@mail.ru");
+        user2 = userService.addUser(user2);
 
         List<UserDto> list = userService.getUsersList();
-        Assertions.assertEquals(list.size(), 2);
+        Assertions.assertTrue(list.contains(user2));
+        Assertions.assertTrue(list.contains(user));
     }
 
 }
