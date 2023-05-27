@@ -109,14 +109,9 @@ public class ItemServiceImpl implements ItemService {
                         .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
                 if (itemBookingList.size() > 1) {
-                    itemDto.setLastBooking(BookingMapper.toBookingDto(itemBookingList.get(itemBookingList.size() - 1)));
-                    List<Booking> itemBookingListNext = itemBookingList.stream()
-                            .filter(booking -> booking.getDateBegin().after(new Date()) && booking.getStatus().equals("APPROVED"))
-                            .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                            .collect(Collectors.toList());
-                    if (itemBookingListNext.size() > 1) {
-                        itemDto.setNextBooking(BookingMapper.toBookingDto(itemBookingListNext.get(1)));
-                    }
+                    itemDto.setLastBooking(getLastBooking(itemBookingList, item, ownerId));
+                    itemDto.setNextBooking(getNextBooking(itemBookingList, item, ownerId));
+
                 }
             }
             List<CommentDto> commentList = getComment(item);
@@ -136,12 +131,7 @@ public class ItemServiceImpl implements ItemService {
 
         List<ItemDto> itemDtoList = new ArrayList<>();
         itemList.stream().forEach(item -> {
-            ItemDto itemDto = ItemMapper.toItemDto(item);
-            List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
-                    .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                    .collect(Collectors.toList());
-            itemDto.setLastBooking(getLastBooking(itemBookingList, item, ownerId));
-            itemDto.setNextBooking(getNextBooking(itemBookingList, item, ownerId));
+            ItemDto itemDto = getItem(ownerId, item.getId());
             itemDtoList.add(itemDto);
         });
 
@@ -150,21 +140,22 @@ public class ItemServiceImpl implements ItemService {
 
 
     private BookingDto getLastBooking(List<Booking> bookings, Item item, Integer ownerId) {
-        Optional<Booking> lastBooking = bookings.stream()
-                .filter(booking -> !booking.getDateBegin().after(new Date())).findFirst();
-        if (lastBooking.isEmpty() || !item.getOwner().getId().equals(ownerId)) {
+        log.info("------- bookings: "+bookings);
+        if (bookings.isEmpty() || !item.getOwner().getId().equals(ownerId)) {
             return null;
         }
-        return BookingMapper.toBookingDto(lastBooking.get());
+        return BookingMapper.toBookingDto(bookings.get(bookings.size()-1));
     }
 
     private BookingDto getNextBooking(List<Booking> bookings, Item item, Integer ownerId) {
-        Optional<Booking> nextBooking = bookings.stream()
-                .filter(booking -> booking.getDateBegin().after(new Date())).reduce((first, second) -> second);
-        if (nextBooking.isEmpty() || !item.getOwner().getId().equals(ownerId)) {
+        List<Booking> itemBookingListNext = bookings.stream()
+                .filter(booking -> booking.getDateBegin().after(new Date()) && booking.getStatus().equals("APPROVED"))
+                .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
+                .collect(Collectors.toList());
+        if (itemBookingListNext.isEmpty()) {
             return null;
         }
-        return BookingMapper.toBookingDto(nextBooking.get());
+        return BookingMapper.toBookingDto(itemBookingListNext.get(1));
     }
 
 
