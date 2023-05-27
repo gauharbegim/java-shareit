@@ -1,8 +1,10 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dao.BookingRepository;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.comment.dao.CommentRepository;
@@ -20,11 +22,13 @@ import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
@@ -137,15 +141,33 @@ public class ItemServiceImpl implements ItemService {
             List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
                     .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                     .collect(Collectors.toList());
-            if (itemBookingList.size() > 1) {
-                itemDto.setLastBooking(BookingMapper.toBookingDto(itemBookingList.get(itemBookingList.size() - 1)));
-                itemDto.setNextBooking(BookingMapper.toBookingDto(itemBookingList.get(itemBookingList.size() - 2)));
-            }
+            itemDto.setLastBooking(getLastBooking(itemBookingList, item, ownerId));
+            itemDto.setNextBooking(getNextBooking(itemBookingList, item, ownerId));
             itemDtoList.add(itemDto);
         });
 
         return itemDtoList;
     }
+
+
+    private BookingDto getLastBooking(List<Booking> bookings, Item item, Integer ownerId) {
+        Optional<Booking> lastBooking = bookings.stream()
+                .filter(booking -> !booking.getDateBegin().after(new Date())).findFirst();
+        if (lastBooking.isEmpty() || !item.getOwner().getId().equals(ownerId)) {
+            return null;
+        }
+        return BookingMapper.toBookingDto(lastBooking.get());
+    }
+
+    private BookingDto getNextBooking(List<Booking> bookings, Item item, Integer ownerId) {
+        Optional<Booking> nextBooking = bookings.stream()
+                .filter(booking -> booking.getDateBegin().after(new Date())).reduce((first, second) -> second);
+        if (nextBooking.isEmpty() || !item.getOwner().getId().equals(ownerId)) {
+            return null;
+        }
+        return BookingMapper.toBookingDto(nextBooking.get());
+    }
+
 
     @Override
     public List<ItemDto> getItems(String text) {
