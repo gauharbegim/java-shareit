@@ -140,11 +140,11 @@ public class ItemServiceImpl implements ItemService {
 
 
     private BookingDto getLastBooking(List<Booking> bookings, Item item, Integer ownerId) {
-        log.info("------- bookings: "+bookings);
+        log.info("------- bookings: " + bookings);
         if (bookings.isEmpty() || !item.getOwner().getId().equals(ownerId)) {
             return null;
         }
-        return BookingMapper.toBookingDto(bookings.get(bookings.size()-1));
+        return BookingMapper.toBookingDto(bookings.get(bookings.size() - 1));
     }
 
     private BookingDto getNextBooking(List<Booking> bookings, Item item, Integer ownerId) {
