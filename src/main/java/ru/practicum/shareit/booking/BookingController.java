@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +22,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/bookings")
-@Slf4j
 public class BookingController {
     @Autowired
     private BookingService bookingService;
@@ -51,15 +49,19 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getBooking(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
-                                       @RequestParam(name = "state", required = false, defaultValue = "ALL") BookingStatus state) {
-        return bookingService.getBooking(state.toString(), ownerId);
+                                       @RequestParam(name = "state",
+                                               required = false,
+                                               defaultValue = "ALL") BookingStatus state,
+                                       @RequestParam(required = false, name = "from") Integer from,
+                                       @RequestParam(required = false, name = "size") Integer size) {
+        return bookingService.getBooking(state, ownerId, from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getOwnerBookedItemList(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
-                                                   @RequestParam(name = "state", required = false, defaultValue = "ALL") BookingStatus state) {
-        return bookingService.ownerItemsBooking(state.toString(), ownerId);
+                                                   @RequestParam(name = "state", required = false, defaultValue = "ALL") BookingStatus state,
+                                                   @RequestParam(required = false, name = "from") Integer from,
+                                                   @RequestParam(required = false, name = "size") Integer size) {
+        return bookingService.ownerItemsBookingLists(state, ownerId, from, size);
     }
-
-
 }

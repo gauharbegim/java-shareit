@@ -9,11 +9,13 @@ import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
@@ -24,15 +26,11 @@ public class UserServiceImpl implements UserService {
     }
 
     public void deleteUser(Integer userId) {
-        if (userId < 1) {
-            throw new UserNotFoundException("Id пользователя должно быть больше 0");
-        }
         userRepository.deleteById(userId);
     }
 
     public UserDto updateUser(Integer id, UserDto userDto) {
         User userByEmail = null;
-
         if (userDto.getEmail() != null) {
             userByEmail = userRepository.findByEmail(userDto.getEmail());
         }

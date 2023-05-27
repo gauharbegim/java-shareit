@@ -24,7 +24,7 @@ public class UserController {
     private final String pathId = "/{id}";
 
 
-    @GetMapping()
+    @GetMapping
     public List<UserDto> getUsers() {
         return userService.getUsersList();
     }
@@ -34,7 +34,7 @@ public class UserController {
         return userService.getUser(id);
     }
 
-    @PostMapping()
+    @PostMapping
     public UserDto create(@Valid @RequestBody UserDto user) {
         return userService.addUser(user);
     }
