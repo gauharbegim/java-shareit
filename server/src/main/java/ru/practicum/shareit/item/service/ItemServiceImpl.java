@@ -108,10 +108,11 @@ public class ItemServiceImpl implements ItemService {
                         .filter(booking -> booking.getStatus().equals("APPROVED"))
                         .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
-                if (itemBookingList.size() > 1) {
+                if (itemBookingList.size() > 0) {
                     itemDto.setLastBooking(getLastBooking(itemBookingList, item, ownerId));
+                }
+                if (itemBookingList.size() > 1) {
                     itemDto.setNextBooking(getNextBooking(itemBookingList, item, ownerId));
-
                 }
             }
             List<CommentDto> commentList = getComment(item);
