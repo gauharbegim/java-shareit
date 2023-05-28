@@ -95,35 +95,6 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-//    @Override
-//    public ItemDto getItem(Integer ownerId, Integer itemId) {
-//        checkOwner(ownerId);
-//
-//        Optional<Item> newItem = itemRepository.findById(itemId);
-//        if (newItem.isPresent()) {
-//            Item item = newItem.get();
-//            ItemDto itemDto = ItemMapper.toItemDto(item);
-//
-//            if (item.getOwner().getId().equals(ownerId)) {
-//                List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
-//                        .filter(booking -> booking.getStatus().equals("APPROVED"))
-//                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-//                        .collect(Collectors.toList());
-//                if (itemBookingList.size() > 1) {
-//                    itemDto.setLastBooking(getLastBooking(itemBookingList, item, ownerId));
-//                }
-//                if (itemBookingList.size() > 1) {
-//                    itemDto.setNextBooking(getNextBooking(itemBookingList, item, ownerId));
-//                }
-//            }
-//            List<CommentDto> commentList = getComment(item);
-//            itemDto.setComments(commentList);
-//            return itemDto;
-//        } else {
-//            throw new IncorrectParameterException("Item не найден");
-//        }
-//    }
-
     @Override
     public ItemDto getItem(Integer ownerId, Integer itemId) {
         checkOwner(ownerId);
@@ -165,18 +136,6 @@ public class ItemServiceImpl implements ItemService {
         });
 
         return itemDtoList;
-    }
-
-
-    private BookingDto getLastBooking(List<Booking> bookings, Item item, Integer ownerId) {
-        bookings = bookings.stream()
-                .filter(booking -> booking.getDateBegin().isAfter(LocalDateTime.now()) && booking.getStatus().equals("APPROVED"))
-                .sorted(Comparator.comparing(Booking::getDateEnd).reversed())
-                .collect(Collectors.toList());
-        if (bookings.isEmpty() || !item.getOwner().getId().equals(ownerId)) {
-            return null;
-        }
-        return BookingMapper.toBookingDto(bookings.get(bookings.size() - 2));
     }
 
     private BookingDto getNextBooking(List<Booking> bookings, Item item, Integer ownerId) {
