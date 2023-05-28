@@ -30,6 +30,7 @@ public class BookingController {
     public BookingDto approve(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
                               @PathVariable Integer bookingId,
                               @RequestParam(name = "approved") boolean approved) {
+        log.info("******************************************");
         return bookingService.aprove(ownerId, bookingId, approved);
     }
 
@@ -53,9 +54,6 @@ public class BookingController {
                                                    @RequestParam(name = "state", required = false, defaultValue = "ALL") String state,
                                                    @RequestParam(required = false, name = "from") Integer from,
                                                    @RequestParam(required = false, name = "size") Integer size) {
-        log.info("from: " + from);
-        log.info("size: " + size);
-        log.info("state: " + state);
         return bookingService.ownerItemsBookingLists(state, ownerId, from, size);
     }
 }

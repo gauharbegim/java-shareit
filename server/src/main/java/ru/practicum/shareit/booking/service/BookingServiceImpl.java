@@ -51,7 +51,9 @@ public class BookingServiceImpl implements BookingService {
         checkDates(bookingDto);
 
         Optional<Item> item = itemRepository.findById(bookingDto.getItemId());
-        if (item.isPresent() && item.get().getIsAvailable()) {
+        if (item.isEmpty()) {
+            throw new IncorrectParameterException("Вещи с таким id нет");
+        } else if (item.get().getIsAvailable()) {
             Integer ownerId = item.get().getOwner().getId();
             if (ownerId.equals(bookerId)) {
                 throw new IncorrectParameterException("Неверные параметры");
@@ -73,8 +75,6 @@ public class BookingServiceImpl implements BookingService {
 
             return BookingMapper.toBookingDto(booking);
 
-        } else if (!item.isPresent()) {
-            throw new IncorrectParameterException("Вещи с таким id нет");
         } else {
             throw new IncorrectBookingParameterException("Вещь недоступна");
         }
@@ -84,6 +84,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto aprove(Integer ownerId, Integer bookingId, boolean approved) {
         Optional<Booking> bookingOption = bookingRepository.findById(bookingId);
         if (bookingOption.isPresent()) {
+            log.info("booking: " + bookingOption.get());
             Item item = bookingOption.get().getItem();
             User owner = item.getOwner();
             if (owner.getId().equals(ownerId)) {

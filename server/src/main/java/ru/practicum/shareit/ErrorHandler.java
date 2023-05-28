@@ -64,7 +64,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleUserNotFoundException(final BookingNotFoundException bookingNotFoundException) {
-        return new ErrorResponse("Нет пользователя с таким ID={}");
+        return new ErrorResponse(bookingNotFoundException.getMessage());
     }
 
     @ExceptionHandler
