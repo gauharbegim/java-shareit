@@ -26,10 +26,10 @@ public class BookingController {
         return bookingService.booking(bookerId, bookingDto);
     }
 
-    @PatchMapping(path = pathId)
+    @PatchMapping(pathId)
     public BookingDto approve(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
                               @PathVariable Integer bookingId,
-                              @RequestParam boolean approved) {
+                              @RequestParam(name = "approved") boolean approved) {
         return bookingService.aprove(ownerId, bookingId, approved);
     }
 
@@ -41,15 +41,21 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getBooking(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
-                                       @RequestParam(name = "state", required = false, defaultValue = "ALL") String state) {
-        return bookingService.getBooking(state, ownerId);
+                                       @RequestParam(name = "state", required = false,
+                                               defaultValue = "ALL") String state,
+                                       @RequestParam(required = false, name = "from") Integer from,
+                                       @RequestParam(required = false, name = "size") Integer size) {
+        return bookingService.getBooking(state, ownerId, from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getOwnerBookedItemList(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
-                                                   @RequestParam(name = "state", required = false, defaultValue = "ALL") String state) {
-        return bookingService.ownerItemsBooking(state, ownerId);
+                                                   @RequestParam(name = "state", required = false, defaultValue = "ALL") String state,
+                                                   @RequestParam(required = false, name = "from") Integer from,
+                                                   @RequestParam(required = false, name = "size") Integer size) {
+        log.info("from: " + from);
+        log.info("size: " + size);
+        log.info("state: " + state);
+        return bookingService.ownerItemsBookingLists(state, ownerId, from, size);
     }
-
-
 }

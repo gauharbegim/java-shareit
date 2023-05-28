@@ -8,6 +8,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingStatus;
 import ru.practicum.shareit.client.BaseClient;
 
 import java.util.HashMap;
@@ -31,18 +32,26 @@ public class BookingClient extends BaseClient {
         return post("", userId, bookingDto);
     }
 
-    public ResponseEntity<Object> getBookings(Integer userId, String state) {
-        return get("?state=" + state, userId.longValue());
-    }
-
-    public ResponseEntity<Object> getOwnerItemsBooking(Integer userId, String state) {
-        return get("/owner?state=" + state, userId.longValue());
+    public ResponseEntity<Object> getOwnerItemsBooking(Integer userId, String state, Integer from, Integer size) {
+        Map<String, Object> parameter = new HashMap<>();
+        parameter.put("from", from);
+        parameter.put("size", size);
+        parameter.put("state", state);
+        return get("/owner?state={state}&from={from}&size={size}", userId.longValue(), parameter);
     }
 
     public ResponseEntity<Object> getBooking(Integer userId, Integer bookingId) {
         Map<String, Object> parameter = new HashMap<>();
         parameter.put("bookingId", bookingId);
         return get("/{bookingId}", userId.longValue(), parameter);
+    }
+
+    public ResponseEntity<Object> getBookingPages(String status, Integer userId, Integer from, Integer size) {
+        Map<String, Object> parameter = new HashMap<>();
+        parameter.put("from", from);
+        parameter.put("size", size);
+        parameter.put("state", status);
+        return get("?state={state}&from={from}&size={size}", userId.longValue(), parameter);
     }
 
     public ResponseEntity<Object> aprove(Integer userId, Integer bookingId, boolean approved) {

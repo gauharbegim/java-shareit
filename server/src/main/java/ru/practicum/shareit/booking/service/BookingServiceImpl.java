@@ -52,12 +52,12 @@ public class BookingServiceImpl implements BookingService {
 
         Optional<Item> item = itemRepository.findById(bookingDto.getItemId());
         if (item.isPresent() && item.get().getIsAvailable()) {
-            if (item.get().getOwner().getId().equals(bookerId)) {
+            Integer ownerId = item.get().getOwner().getId();
+            if (ownerId.equals(bookerId)) {
                 throw new IncorrectParameterException("Неверные параметры");
             }
 
             Booking booking = new Booking();
-
             Optional<User> user = userRepository.findById(bookerId);
             if (user.isPresent()) {
                 booking.setBooker(user.get());
@@ -110,111 +110,102 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void checkDates(BookingDto bookingDto) {
-        if (bookingDto.getStart() == null
-                || bookingDto.getEnd() == null
+        if (bookingDto.getEnd() == null || bookingDto.getStart() == null
+                || bookingDto.getEnd().equals(bookingDto.getStart())
                 || bookingDto.getEnd().isBefore(bookingDto.getStart())
                 || bookingDto.getEnd().isBefore(LocalDateTime.now())
                 || bookingDto.getStart().isBefore(LocalDateTime.now())
-                || bookingDto.getStart().equals(bookingDto.getEnd())
         ) {
             throw new IncorrectBookingParameterException("Неверные параметры");
         }
     }
 
     @Override
-    public List<BookingDto> getBooking(String state, Integer bookerId) {
+    public List<BookingDto> getBooking(String state, Integer bookerId, Integer from, Integer size) {
         Optional<User> user = userRepository.findById(bookerId);
         if (user.isPresent()) {
-            List<Booking> bookingList = bookingRepository.findByBooker(user.get());
-            List<Booking> list;
-            if (state.equals("CURRENT")) {
-                list = bookingList.stream()
-                        .filter(booking -> booking.getDateBegin().isBefore(LocalDateTime.now()))
-                        .filter(booking -> booking.getDateEnd().isAfter(LocalDateTime.now()))
-                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                        .collect(Collectors.toList());
-            } else if (state.equals("REJECTED")) {
-                list = bookingList.stream()
-                        .filter(booking -> booking.getStatus().equals("REJECTED"))
-                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                        .collect(Collectors.toList());
-            } else if (state.equals("WAITING")) {
-                list = bookingList.stream()
-                        .filter(booking -> booking.getStatus().equals("WAITING"))
-                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                        .collect(Collectors.toList());
-            } else if (state.equals("PAST")) {
-                list = bookingList.stream()
-                        .filter(booking -> booking.getDateBegin().isBefore(LocalDateTime.now()))
-                        .filter(booking -> booking.getDateEnd().isBefore(LocalDateTime.now()))
-                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                        .collect(Collectors.toList());
-            } else if (state.equals("FUTURE")) {
-                list = bookingList.stream()
-                        .filter(booking -> booking.getDateBegin().isAfter(LocalDateTime.now()) && booking.getDateEnd().isAfter(LocalDateTime.now()))
-                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                        .collect(Collectors.toList());
-            } else if (state.equals("ALL")) {
-                list = bookingList.stream()
-                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                        .collect(Collectors.toList());
+            List<Booking> bookingList = new ArrayList<>();
+            if (from == null && size == null) {
+                bookingList = bookingRepository.findByBooker(user.get());
+            } else if (from >= 0 && size > 0) {
+                bookingList = bookingRepository.findByBookerByPage(user.get().getId(), from, size);
             } else {
-                throw new BookingUnknownStateException(state);
+                throw new IncorrectBookingParameterException("Неверные параметры");
             }
+
+            List<Booking> list = getBookingListByStatus(state, bookingList);
             return BookingMapper.toBookingDtoList(list);
         } else {
             throw new UserNotFoundException("Пользователь не найден");
         }
     }
 
-    @Override
-    public List<BookingDto> ownerItemsBooking(String state, Integer ownerId) {
-        Optional<User> user = userRepository.findById(ownerId);
-        if (user.isPresent()) {
-            List<Item> ownerItemList = itemRepository.findByOwner(user.get());
-            List<Booking> bookingList = new ArrayList<>();
-            ownerItemList.stream().forEach(item -> {
-                        List<Booking> itemBookingList = bookingRepository.findByItem(item);
-                        bookingList.addAll(itemBookingList);
-                    }
-            );
-
-            log.info("state: " + state);
-            List<Booking> list;
-            if (state.equals("CURRENT")) {
-                list = bookingList.stream()
-                        .filter(booking -> booking.getDateBegin().isBefore(LocalDateTime.now()))
-                        .filter(booking -> booking.getDateEnd().isAfter(LocalDateTime.now()))
-                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                        .collect(Collectors.toList());
-            } else if (state.equals("REJECTED")) {
-                list = bookingList.stream()
-                        .filter(booking -> booking.getStatus().equals("REJECTED"))
-                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                        .collect(Collectors.toList());
-            } else if (state.equals("WAITING")) {
-                list = bookingList.stream()
-                        .filter(booking -> booking.getStatus().equals("WAITING"))
-                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                        .collect(Collectors.toList());
-            } else if (state.equals("PAST")) {
+    private List<Booking> getBookingListByStatus(String state, List<Booking> bookingList) {
+        log.info("+++++"+state+"+++++");
+        List<Booking> list = new ArrayList<>();
+        switch (state) {
+            case "PAST":
                 list = bookingList.stream()
                         .filter(booking -> booking.getDateBegin().isBefore(LocalDateTime.now()))
                         .filter(booking -> booking.getDateEnd().isBefore(LocalDateTime.now()))
                         .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
-            } else if (state.equals("FUTURE")) {
+                break;
+            case "FUTURE":
                 list = bookingList.stream()
                         .filter(booking -> booking.getDateBegin().isAfter(LocalDateTime.now()) && booking.getDateEnd().isAfter(LocalDateTime.now()))
                         .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
-            } else if (state.equals("ALL")) {
+                break;
+            case "CURRENT":
+                list = bookingList.stream()
+                        .filter(booking -> booking.getDateBegin().isBefore(LocalDateTime.now()))
+                        .filter(booking -> booking.getDateEnd().isAfter(LocalDateTime.now()))
+                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
+                        .collect(Collectors.toList());
+                break;
+            case "WAITING":
+                list = bookingList.stream()
+                        .filter(booking -> booking.getStatus().equals("WAITING"))
+                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
+                        .collect(Collectors.toList());
+                break;
+            case "REJECTED":
+                list = bookingList.stream()
+                        .filter(booking -> booking.getStatus().equals("REJECTED"))
+                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
+                        .collect(Collectors.toList());
+                break;
+            case "ALL":
                 list = bookingList.stream()
                         .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
-            } else {
+                break;
+            default:
                 throw new BookingUnknownStateException(state);
-            }
+        }
+        return list;
+    }
+
+    @Override
+    public List<BookingDto> ownerItemsBookingLists(String state, Integer ownerId, Integer from, Integer size) {
+        Optional<User> user = userRepository.findById(ownerId);
+        if (user.isPresent()) {
+            List<Item> ownerItemList = itemRepository.findByOwner(user.get());
+            List<Booking> bookingList = new ArrayList<>();
+            ownerItemList.forEach(item -> {
+                        List<Booking> itemBookingList = new ArrayList<>();
+                        if (from == null && size == null) {
+                            itemBookingList = bookingRepository.findByItem(item);
+                        } else if (from >= 0 && size > 0) {
+                            itemBookingList = bookingRepository.findByItemByLimits(item.getId(), from, size);
+                        } else {
+                            throw new IncorrectBookingParameterException("Неверные параметры");
+                        }
+                        bookingList.addAll(itemBookingList);
+                    }
+            );
+            List<Booking> list = getBookingListByStatus(state, bookingList);
             return BookingMapper.toBookingDtoList(list);
         } else {
             throw new UserNotFoundException("Пользователь не найден");

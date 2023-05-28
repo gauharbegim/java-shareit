@@ -12,6 +12,7 @@ import ru.practicum.shareit.booking.dto.Variables;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Controller
 @RequestMapping(path = "/bookings")
@@ -41,15 +42,27 @@ public class BookingController {
         return bookingClient.getBooking(userId, bookingId);
     }
 
-    @GetMapping
-    public ResponseEntity<Object> getBooking(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
-                                             @RequestParam(name = "state", required = false, defaultValue = "ALL") String state) {
-            return bookingClient.getBookings(ownerId, state);
-    }
-
     @GetMapping("/owner")
     public ResponseEntity<Object> getOwnerBookedItemList(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
-                                                         @RequestParam(name = "state", required = false, defaultValue = "ALL") String state) {
-        return bookingClient.getOwnerItemsBooking(ownerId, state);
+                                                         @RequestParam(name = "state",
+                                                                 required = false,
+                                                                 defaultValue = "ALL") String state,
+                                                         @RequestParam(required = false, name = "from") Integer from,
+                                                         @RequestParam(required = false, name = "size") Integer size) {
+        log.info("from: " + from);
+        log.info("size: " + size);
+        log.info("state: " + state);
+        return bookingClient.getOwnerItemsBooking(ownerId, state, from, size);
+    }
+
+
+    @GetMapping
+    public ResponseEntity<Object> getBooking(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
+                                             @RequestParam(name = "state",
+                                                     required = false,
+                                                     defaultValue = "ALL") String state,
+                                             @RequestParam(required = false, name = "from") Integer from,
+                                             @RequestParam(required = false, name = "size") Integer size) {
+        return bookingClient.getBookingPages(state, ownerId, from, size);
     }
 }
