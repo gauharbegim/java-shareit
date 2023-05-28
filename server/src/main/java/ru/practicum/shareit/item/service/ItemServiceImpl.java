@@ -158,7 +158,8 @@ public class ItemServiceImpl implements ItemService {
         List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
                 .filter(booking -> (booking.getDateEnd().isBefore(LocalDateTime.now().plusDays(1))))
                 .filter(booking -> booking.getStatus().equals("APPROVED"))
-                .sorted((a, b) -> Math.toIntExact(b.getDateBegin().getSecond() - a.getDateBegin().getSecond()))
+//                .sorted((a, b) -> Math.toIntExact(b.getDateBegin().getSecond() - a.getDateBegin().getSecond()))
+                .sorted(Comparator.comparing(Booking::getDateBegin))
                 .collect(Collectors.toList());
         if (itemBookingList.size() > 0) {
             return BookingMapper.toBookingDto(itemBookingList.get(0));
