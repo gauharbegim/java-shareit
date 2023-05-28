@@ -5,7 +5,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @AllArgsConstructor
@@ -17,8 +17,8 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private LocalDateTime dateBegin;
-    private LocalDateTime dateEnd;
+    private Date dateBegin;
+    private Date dateEnd;
 
     @ManyToOne
     @JoinColumn(name = "ITEM_ID", referencedColumnName = "ID")

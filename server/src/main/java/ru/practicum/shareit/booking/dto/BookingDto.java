@@ -8,7 +8,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.constraints.FutureOrPresent;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -18,11 +18,11 @@ public class BookingDto {
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @FutureOrPresent
-    private LocalDateTime start;
+    private Date start;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @FutureOrPresent
-    private LocalDateTime end;
+    private Date end;
 
     private Integer itemId;
     private ItemDto item;
