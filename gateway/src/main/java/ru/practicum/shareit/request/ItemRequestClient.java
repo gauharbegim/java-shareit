@@ -31,14 +31,14 @@ public class ItemRequestClient extends BaseClient {
     }
 
     public ResponseEntity<Object> createItemRequest(Integer userId, ItemRequestRequestDto requestDto) {
-        return post("", userId, requestDto);
+        return post("", userId.longValue(), requestDto);
     }
 
     public ResponseEntity<Object> getItemRequestsByUser(Integer userId) {
-        return get("", userId);
+        return get("", userId.longValue());
     }
 
     public ResponseEntity<Object> getItemRequest(Integer requestId, Integer userId) {
-        return get("/" + requestId, userId);
+        return get("/" + requestId, userId.longValue());
     }
 }

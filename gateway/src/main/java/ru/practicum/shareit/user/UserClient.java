@@ -27,7 +27,7 @@ public class UserClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getUser(Integer userId) {
-        return get("/" + userId);
+        return get("/" + userId.longValue());
     }
 
     public ResponseEntity<Object> createUser(UserDto requestDto) {
@@ -35,10 +35,10 @@ public class UserClient extends BaseClient {
     }
 
     public ResponseEntity<Object> updateUser(Integer userId, UserDto requestDto) {
-        return patch("/" + userId, requestDto);
+        return patch("/" + userId.longValue(), requestDto);
     }
 
     public ResponseEntity<Object> deleteUser(Integer userId) {
-        return delete("/" + userId);
+        return delete("/" + userId.longValue());
     }
 }
