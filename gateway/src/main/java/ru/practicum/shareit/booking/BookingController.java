@@ -12,7 +12,6 @@ import ru.practicum.shareit.booking.dto.Variables;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @Controller
 @RequestMapping(path = "/bookings")
