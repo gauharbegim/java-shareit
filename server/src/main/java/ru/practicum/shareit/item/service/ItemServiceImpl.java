@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
@@ -148,9 +150,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getItems(Integer ownerId, Integer from, Integer size) {
+        log.info("ownerId: " + ownerId);
+        log.info("from: " + from);
+        log.info("size: " + size);
         checkOwner(ownerId);
         Optional<User> owner = userRepository.findById(ownerId);
-        List<Item> itemList = new ArrayList<>();
+        List<Item> itemList;
         if (from != null && size != null && from >= 0 && size > 0) {
             Sort sortById = Sort.by(Sort.Direction.ASC, "id");
             Pageable page = PageRequest.of(from, size, sortById);
