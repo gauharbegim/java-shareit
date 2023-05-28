@@ -28,19 +28,19 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getItems(Integer userId) {
-        return get("", userId.longValue());
+        return get("", userId);
     }
 
     public ResponseEntity<Object> getItem(Integer itemId, Integer userId) {
-        return get("/" + itemId, userId.longValue());
+        return get("/" + itemId, userId);
     }
 
     public ResponseEntity<Object> createItem(Integer userId, ItemRequestDto requestDto) {
-        return post("", userId.longValue(), requestDto);
+        return post("", userId, requestDto);
     }
 
     public ResponseEntity<Object> updateItem(ItemRequestDto requestDto, Integer itemId, Integer userId) {
-        return patch("/" + itemId, userId.longValue(), requestDto);
+        return patch("/" + itemId, userId, requestDto);
     }
 
     public ResponseEntity<Object> deleteItem(Integer itemId) {
@@ -55,6 +55,6 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> createComment(Integer itemId, Integer userId, CommentRequestDto requestDto) {
-        return post("/" + itemId + "/comment", userId.longValue(), requestDto);
+        return post("/" + itemId + "/comment", userId, requestDto);
     }
 }
