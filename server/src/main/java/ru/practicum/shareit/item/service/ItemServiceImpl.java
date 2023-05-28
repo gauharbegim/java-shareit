@@ -150,9 +150,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getItems(Integer ownerId, Integer from, Integer size) {
-        log.info("ownerId: " + ownerId);
-        log.info("from: " + from);
-        log.info("size: " + size);
         checkOwner(ownerId);
         Optional<User> owner = userRepository.findById(ownerId);
         List<Item> itemList;

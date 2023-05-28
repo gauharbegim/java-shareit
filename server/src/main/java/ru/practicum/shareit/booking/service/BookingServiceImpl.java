@@ -140,7 +140,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private List<Booking> getBookingListByStatus(String state, List<Booking> bookingList) {
-        log.info("+++++" + state + "+++++");
         List<Booking> list = new ArrayList<>();
         switch (state) {
             case "PAST":
