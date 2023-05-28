@@ -135,16 +135,13 @@ public class ItemServiceImpl implements ItemService {
 
             if (item.getOwner().getId().equals(ownerId)) {
                 List<Booking> itemBookingList = bookingRepository.findByItem(item);
-                if (itemBookingList.size() > 1) {
-                    log.info("---------> itemBookingList: " + itemBookingList);
-                    itemBookingList.stream()
-                            .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                            .filter(booking -> booking.getStatus().equals("APPROVED"))
-                            .filter(booking -> booking.getDateEnd().isBefore(LocalDateTime.now()))
-                            .findFirst()
-                            .ifPresent(booking -> itemDto.setLastBooking(BookingMapper.toBookingDto(booking)));
+                itemBookingList.stream()
+                        .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
+                        .filter(booking -> booking.getStatus().equals("APPROVED"))
+                        .filter(booking -> booking.getDateBegin().isBefore(LocalDateTime.now()))
+                        .findFirst()
+                        .ifPresent(booking -> itemDto.setLastBooking(BookingMapper.toBookingDto(booking)));
 
-                }
                 itemDto.setNextBooking(getNextBooking(itemBookingList, item, ownerId));
             }
             List<CommentDto> commentList = getComment(item);
@@ -176,7 +173,6 @@ public class ItemServiceImpl implements ItemService {
                 .filter(booking -> booking.getDateBegin().isAfter(LocalDateTime.now()) && booking.getStatus().equals("APPROVED"))
                 .sorted(Comparator.comparing(Booking::getDateEnd).reversed())
                 .collect(Collectors.toList());
-        log.info("------- bookings: " + bookings);
         if (bookings.isEmpty() || !item.getOwner().getId().equals(ownerId)) {
             return null;
         }
