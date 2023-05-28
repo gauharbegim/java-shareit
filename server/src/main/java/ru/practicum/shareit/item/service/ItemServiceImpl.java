@@ -1,7 +1,10 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -28,7 +31,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
@@ -113,7 +115,7 @@ public class ItemServiceImpl implements ItemService {
                         .findFirst()
                         .ifPresent(booking -> itemDto.setLastBooking(BookingMapper.toBookingDto(booking)));
 
-                itemDto.setNextBooking(getNextBooking(itemBookingList, item, ownerId));
+                itemDto.setNextBooking(getNextBooking(itemBookingList));
             }
             List<CommentDto> commentList = getComment(item);
             itemDto.setComments(commentList);
@@ -124,21 +126,48 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItems(Integer ownerId) {
+    public List<ItemDto> getItems(Integer ownerId, Integer from, Integer size) {
         checkOwner(ownerId);
         Optional<User> owner = userRepository.findById(ownerId);
-        List<Item> itemList = itemRepository.findByOwner(owner.get());
+        List<Item> itemList;
+        if (from != null && size != null && from >= 0 && size > 0) {
+            Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+            Pageable page = PageRequest.of(from, size, sortById);
+            Page<Item> itemPage = itemRepository.findByOwner(owner.get(), page);
+            itemList = itemPage.getContent();
+        } else {
+            itemList = itemRepository.findByOwner(owner.get());
+        }
 
         List<ItemDto> itemDtoList = new ArrayList<>();
-        itemList.stream().forEach(item -> {
-            ItemDto itemDto = getItem(ownerId, item.getId());
+        itemList.forEach(item -> {
+            ItemDto itemDto = ItemMapper.toItemDto(item);
+            List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
+                    .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
+                    .collect(Collectors.toList());
+            if (itemBookingList.size() > 0) {
+                itemDto.setLastBooking(getLastBooking(item));
+                itemDto.setNextBooking(getNextBooking(itemBookingList));
+            }
             itemDtoList.add(itemDto);
         });
-
         return itemDtoList;
     }
 
-    private BookingDto getNextBooking(List<Booking> bookings, Item item, Integer ownerId) {
+    private BookingDto getLastBooking(Item item) {
+        List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
+                .filter(booking -> (booking.getDateEnd().isBefore(LocalDateTime.now().plusDays(1))))
+                .filter(booking -> booking.getStatus().equals("APPROVED"))
+                .sorted((a, b) -> Math.toIntExact(b.getDateBegin().getSecond() - a.getDateBegin().getSecond()))
+                .collect(Collectors.toList());
+        if (itemBookingList.size() > 0) {
+            return BookingMapper.toBookingDto(itemBookingList.get(0));
+        } else {
+            return null;
+        }
+    }
+
+    private BookingDto getNextBooking(List<Booking> bookings) {
         List<Booking> itemBookingListNext = bookings.stream()
                 .filter(booking -> booking.getDateBegin().isAfter(LocalDateTime.now()) && booking.getStatus().equals("APPROVED"))
                 .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
@@ -160,7 +189,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void checkOwner(Integer ownerId) {
-        User user = new User();
+        User user = null;
         if (ownerId != null) {
             Optional<User> optionalUser = userRepository.findById(ownerId);
             if (optionalUser.isPresent()) {
@@ -178,7 +207,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public CommentDto addComment(Integer authorId, Integer itemId, CommentDto commentDto) {
         Optional<User> authorOption = userRepository.findById(authorId);
-        if (!authorOption.isPresent()) {
+        if (authorOption.isEmpty()) {
             throw new UserNotFoundException("Автор не найден");
         }
         User author = authorOption.get();
