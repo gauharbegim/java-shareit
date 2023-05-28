@@ -18,6 +18,7 @@ import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -111,9 +112,9 @@ public class BookingServiceImpl implements BookingService {
     private void checkDates(BookingDto bookingDto) {
         if (bookingDto.getStart() == null
                 || bookingDto.getEnd() == null
-                || bookingDto.getEnd().before(bookingDto.getStart())
-                || bookingDto.getEnd().before(new Date())
-                || bookingDto.getStart().before(new Date())
+                || bookingDto.getEnd().isBefore(bookingDto.getStart())
+                || bookingDto.getEnd().isBefore(LocalDateTime.now())
+                || bookingDto.getStart().isBefore(LocalDateTime.now())
                 || bookingDto.getStart().equals(bookingDto.getEnd())
         ) {
             throw new IncorrectBookingParameterException("Неверные параметры");
@@ -128,8 +129,8 @@ public class BookingServiceImpl implements BookingService {
             List<Booking> list;
             if (state.equals("CURRENT")) {
                 list = bookingList.stream()
-                        .filter(booking -> booking.getDateBegin().before(new Date()))
-                        .filter(booking -> booking.getDateEnd().after(new Date()))
+                        .filter(booking -> booking.getDateBegin().isBefore(LocalDateTime.now()))
+                        .filter(booking -> booking.getDateEnd().isAfter(LocalDateTime.now()))
                         .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
             } else if (state.equals("REJECTED")) {
@@ -144,13 +145,13 @@ public class BookingServiceImpl implements BookingService {
                         .collect(Collectors.toList());
             } else if (state.equals("PAST")) {
                 list = bookingList.stream()
-                        .filter(booking -> booking.getDateBegin().before(new Date()))
-                        .filter(booking -> booking.getDateEnd().before(new Date()))
+                        .filter(booking -> booking.getDateBegin().isBefore(LocalDateTime.now()))
+                        .filter(booking -> booking.getDateEnd().isBefore(LocalDateTime.now()))
                         .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
             } else if (state.equals("FUTURE")) {
                 list = bookingList.stream()
-                        .filter(booking -> booking.getDateBegin().after(new Date()) && booking.getDateEnd().after(new Date()))
+                        .filter(booking -> booking.getDateBegin().isAfter(LocalDateTime.now()) && booking.getDateEnd().isAfter(LocalDateTime.now()))
                         .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
             } else if (state.equals("ALL")) {
@@ -182,8 +183,8 @@ public class BookingServiceImpl implements BookingService {
             List<Booking> list;
             if (state.equals("CURRENT")) {
                 list = bookingList.stream()
-                        .filter(booking -> booking.getDateBegin().before(new Date()))
-                        .filter(booking -> booking.getDateEnd().after(new Date()))
+                        .filter(booking -> booking.getDateBegin().isBefore(LocalDateTime.now()))
+                        .filter(booking -> booking.getDateEnd().isAfter(LocalDateTime.now()))
                         .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
             } else if (state.equals("REJECTED")) {
@@ -198,13 +199,13 @@ public class BookingServiceImpl implements BookingService {
                         .collect(Collectors.toList());
             } else if (state.equals("PAST")) {
                 list = bookingList.stream()
-                        .filter(booking -> booking.getDateBegin().before(new Date()))
-                        .filter(booking -> booking.getDateEnd().before(new Date()))
+                        .filter(booking -> booking.getDateBegin().isBefore(LocalDateTime.now()))
+                        .filter(booking -> booking.getDateEnd().isBefore(LocalDateTime.now()))
                         .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
             } else if (state.equals("FUTURE")) {
                 list = bookingList.stream()
-                        .filter(booking -> booking.getDateBegin().after(new Date()) && booking.getDateEnd().after(new Date()))
+                        .filter(booking -> booking.getDateBegin().isAfter(LocalDateTime.now()) && booking.getDateEnd().isAfter(LocalDateTime.now()))
                         .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
             } else if (state.equals("ALL")) {
