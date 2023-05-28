@@ -27,7 +27,7 @@ services:
 
   db:
     image: postgres:14-alpine
-    container_name: shareit-db
+    container_name: prod-db
     environment:
       - POSTGRES_PASSWORD=root
       - POSTGRES_USER=root
