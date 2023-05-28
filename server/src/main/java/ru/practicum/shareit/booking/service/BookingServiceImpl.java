@@ -3,6 +3,9 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -129,7 +132,8 @@ public class BookingServiceImpl implements BookingService {
             if (from == null && size == null) {
                 bookingList = bookingRepository.findByBooker(user.get());
             } else if (from >= 0 && size > 0) {
-                bookingList = bookingRepository.findByBookerByPage(user.get().getId(), from, size);
+                Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "dateBegin"));
+                bookingList = bookingRepository.findAllByBooker(user.get(), pageable).getContent();
             } else {
                 throw new IncorrectBookingParameterException("Неверные параметры");
             }
