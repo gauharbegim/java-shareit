@@ -1,7 +1,10 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -27,7 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
+@Transactional
 public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
@@ -65,6 +68,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto update(Integer ownerId, Integer itemId, ItemDto itemDto) {
         checkOwner(ownerId);
+
         Optional<Item> oldItemOptional = itemRepository.findById(itemId);
         Item oldItem = oldItemOptional.orElse(null);
 
@@ -102,14 +106,14 @@ public class ItemServiceImpl implements ItemService {
         if (newItem.isPresent()) {
             Item item = newItem.get();
             ItemDto itemDto = ItemMapper.toItemDto(item);
-
-            if (item.getOwner().getId().equals(ownerId)) {
-                List<Booking> itemBookingList = bookingRepository.findByItem(item);
+            Integer itemOwnerId = item.getOwner().getId();
+            if (itemOwnerId.equals(ownerId)) {
                 itemDto.setLastBooking(getLastBooking(item));
-                itemDto.setNextBooking(getNextBooking(itemBookingList, item, ownerId));
+                itemDto.setNextBooking(getNextBooking(item));
             }
             List<CommentDto> commentList = getComment(item);
             itemDto.setComments(commentList);
+
             return itemDto;
         } else {
             throw new IncorrectParameterException("Item не найден");
@@ -129,32 +133,48 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
+    private BookingDto getNextBooking(Item item) {
+        List<Booking> itemBookingListNext = bookingRepository.findByItem(item).stream()
+                .filter(booking -> booking.getDateBegin().after(new Date()) && booking.getStatus().equals("APPROVED"))
+                .sorted((a, b) -> Math.toIntExact(a.getDateBegin().toInstant().getEpochSecond() - b.getDateBegin().toInstant().getEpochSecond()))
+                .collect(Collectors.toList());
+        if (itemBookingListNext.size() > 0) {
+            return BookingMapper.toBookingDto(itemBookingListNext.get(0));
+        } else {
+            return null;
+        }
+    }
+
+
     @Override
-    public List<ItemDto> getItems(Integer ownerId) {
+    public List<ItemDto> getItems(Integer ownerId, Integer from, Integer size) {
         checkOwner(ownerId);
         Optional<User> owner = userRepository.findById(ownerId);
-        List<Item> itemList = itemRepository.findByOwner(owner.get());
+        List<Item> itemList = new ArrayList<>();
+        if (from != null && size != null && from >= 0 && size > 0) {
+            Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+            Pageable page = PageRequest.of(from, size, sortById);
+            Page<Item> itemPage = itemRepository.findByOwner(owner.get(), page);
+            itemList = itemPage.getContent();
+        } else {
+            itemList = itemRepository.findByOwner(owner.get());
+        }
 
         List<ItemDto> itemDtoList = new ArrayList<>();
-        itemList.stream().forEach(item -> {
-            ItemDto itemDto = getItem(ownerId, item.getId());
+        itemList.forEach(item -> {
+            ItemDto itemDto = ItemMapper.toItemDto(item);
+            List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
+                    .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
+                    .collect(Collectors.toList());
+            if (itemBookingList.size() > 0) {
+                itemDto.setLastBooking(getLastBooking(item));
+                itemDto.setNextBooking(getNextBooking(item));
+            }
             itemDtoList.add(itemDto);
         });
 
         return itemDtoList;
     }
-
-    private BookingDto getNextBooking(List<Booking> bookings, Item item, Integer ownerId) {
-        List<Booking> itemBookingListNext = bookings.stream()
-                .filter(booking -> booking.getDateBegin().after(new Date()) && booking.getStatus().equals("APPROVED"))
-                .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-                .collect(Collectors.toList());
-        if (itemBookingListNext.isEmpty() || itemBookingListNext.size() < 2) {
-            return null;
-        }
-        return BookingMapper.toBookingDto(itemBookingListNext.get(1));
-    }
-
 
     @Override
     public List<ItemDto> getItems(String text) {
@@ -189,7 +209,6 @@ public class ItemServiceImpl implements ItemService {
         }
         User author = authorOption.get();
 
-
         Optional<Item> itemOption = itemRepository.findById(itemId);
         Item item = itemOption.get();
 
@@ -199,21 +218,21 @@ public class ItemServiceImpl implements ItemService {
                 .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                 .collect(Collectors.toList());
 
-        if (authorBooked.size() > 0) {
-            Comment comment = new Comment();
-            comment.setAuthor(author);
-            comment.setDateCreated(new Date());
-
-            comment.setItem(item);
-            comment.setText(commentDto.getText());
-            commentRepository.save(comment);
-
-            CommentDto newComment = ComentMapper.toCommentDto(comment);
-            newComment.setAuthorName(author.getName());
-            return newComment;
-        } else {
+        if (authorBooked.isEmpty()) {
             throw new IncorrectItemParameterException("Неверные параметры");
         }
+
+        Comment comment = new Comment();
+        comment.setAuthor(author);
+        comment.setDateCreated(new Date());
+        comment.setItem(item);
+        comment.setText(commentDto.getText());
+        commentRepository.save(comment);
+
+        CommentDto newComment = ComentMapper.toCommentDto(comment);
+        newComment.setAuthorName(author.getName());
+        return newComment;
+
     }
 
     private List<CommentDto> getComment(Item item) {

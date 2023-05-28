@@ -14,16 +14,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
-
 public class ItemController {
     private final ItemService itemService;
 
     private final String pathId = "/{id}";
     private final String pathComment = "/{id}/comment";
 
-    @GetMapping()
-    public List<ItemDto> getItems(@RequestHeader(value = Variables.USER_ID) Integer ownerId) {
-        return itemService.getItems(ownerId);
+    @GetMapping
+    public List<ItemDto> getItems(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
+                                  @RequestParam(required = false, name = "from") Integer from,
+                                  @RequestParam(required = false, name = "size") Integer size) {
+        return itemService.getItems(ownerId, from, size);
     }
 
     @GetMapping(pathId)
@@ -53,8 +54,8 @@ public class ItemController {
 
     @PostMapping(pathComment)
     public CommentDto addComment(@RequestHeader(value = Variables.USER_ID) Integer authorId,
-                              @PathVariable Integer id,
-                              @Valid @RequestBody @NotNull CommentDto commentBody) {
+                                 @PathVariable Integer id,
+                                 @Valid @RequestBody @NotNull CommentDto commentBody) {
         return itemService.addComment(authorId, id, commentBody);
     }
 
