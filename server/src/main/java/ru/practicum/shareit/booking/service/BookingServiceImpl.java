@@ -152,7 +152,8 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case "FUTURE":
                 list = bookingList.stream()
-                        .filter(booking -> booking.getDateBegin().after(new Date()) && booking.getDateEnd().after(new Date()))
+                        .filter(booking -> booking.getDateBegin().after(new Date()))
+                        .filter(booking -> booking.getDateEnd().after(new Date()))
                         .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                         .collect(Collectors.toList());
                 break;
