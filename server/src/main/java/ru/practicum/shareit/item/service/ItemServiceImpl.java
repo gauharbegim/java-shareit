@@ -134,7 +134,7 @@ public class ItemServiceImpl implements ItemService {
         itemList.forEach(item -> {
             ItemDto itemDto = ItemMapper.toItemDto(item);
             List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
-                    .sorted(Comparator.comparing(Booking::getDateBegin))
+                    .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
                     .collect(Collectors.toList());
             if (itemBookingList.size() > 0) {
                 itemDto.setLastBooking(getLastBooking(item));
