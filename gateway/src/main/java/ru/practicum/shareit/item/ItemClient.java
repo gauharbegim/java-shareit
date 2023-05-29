@@ -11,7 +11,6 @@ import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.item.dto.CommentRequestDto;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -28,11 +27,8 @@ public class ItemClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> getItems(Integer userId, Integer from, Integer size) {
-        Map<String, Object> parameter = new HashMap<>();
-        parameter.put("from", from);
-        parameter.put("size", size);
-        return get("?", userId.longValue(), parameter);
+    public ResponseEntity<Object> getItems(Integer userId) {
+        return get("", userId.longValue());
     }
 
     public ResponseEntity<Object> getItem(Integer itemId, Integer userId) {

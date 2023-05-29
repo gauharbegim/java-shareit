@@ -22,10 +22,8 @@ public class ItemController {
     private final String pathComment = "/{id}/comment";
 
     @GetMapping
-    public List<ItemDto> getItems(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
-                                  @RequestParam(required = false, name = "from") Integer from,
-                                  @RequestParam(required = false, name = "size") Integer size) {
-        return itemService.getItems(ownerId, from, size);
+    public List<ItemDto> getItems(@RequestHeader(value = Variables.USER_ID) Integer ownerId) {
+        return itemService.getItems(ownerId);
     }
 
     @GetMapping(pathId)

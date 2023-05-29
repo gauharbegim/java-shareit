@@ -14,7 +14,7 @@ public interface ItemService {
 
     ItemDto getItem(Integer ownerId, Integer itemId);
 
-    List<ItemDto> getItems(Integer ownerId, Integer from, Integer size);
+    List<ItemDto> getItems(Integer ownerId);
 
     List<ItemDto> getItems(String text);
 }

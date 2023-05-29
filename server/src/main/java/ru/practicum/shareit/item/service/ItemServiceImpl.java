@@ -1,10 +1,6 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -126,19 +122,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItems(Integer ownerId, Integer from, Integer size) {
-        checkOwner(ownerId);
-        Optional<User> owner = userRepository.findById(ownerId);
+    public List<ItemDto> getItems(Integer ownerId) {
         List<Item> itemList;
-        if (from != null && size != null && from >= 0 && size > 0) {
-            Sort sortById = Sort.by(Sort.Direction.ASC, "created");
-            Pageable page = PageRequest.of(from, size, sortById);
-            Page<Item> itemPage = itemRepository.findByOwner(owner.get(), page);
-            itemList = itemPage.getContent();
-        } else {
+        Optional<User> owner = userRepository.findById(ownerId);
+        if (owner.isPresent()) {
             itemList = itemRepository.findByOwner(owner.get());
+        } else {
+            throw new UserNotFoundException("Пользователь не найден");
         }
-
         List<ItemDto> itemDtoList = new ArrayList<>();
         itemList.forEach(item -> {
             ItemDto itemDto = ItemMapper.toItemDto(item);
