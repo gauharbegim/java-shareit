@@ -32,15 +32,17 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
     List<Booking> findByItemAndBooker(Item item, User user);
 
-    List<Booking> findAllByItemOwnerId(Integer userId, Pageable pageable);
+    List<Booking> findAllByItemOwnerId(Integer userId);
 
-    List<Booking> findAllByItemOwnerIdAndDateBeginBeforeAndDateEndAfter(Integer userId, LocalDateTime t1, LocalDateTime t2,
+    Page<Booking> findAllByItemOwnerId(Integer userId, Pageable pageable);
+
+    Page<Booking> findAllByItemOwnerIdAndDateBeginBeforeAndDateEndAfter(Integer userId, LocalDateTime t1, LocalDateTime t2,
                                                                         Pageable pageable);
 
-    List<Booking> findAllByItemOwnerIdAndDateEndBefore(Integer userId, LocalDateTime now, Pageable pageable);
+    Page<Booking> findAllByItemOwnerIdAndDateEndBefore(Integer userId, LocalDateTime now, Pageable pageable);
 
-    List<Booking> findAllByItemOwnerIdAndDateBeginAfter(Integer userId, LocalDateTime now, Pageable pageable);
+    Page<Booking> findAllByItemOwnerIdAndDateBeginAfter(Integer userId, LocalDateTime now, Pageable pageable);
 
-    List<Booking> findAllByItemOwnerIdAndStatus(Integer userId, String waiting, Pageable pageable);
+    Page<Booking> findAllByItemOwnerIdAndStatus(Integer userId, String waiting, Pageable pageable);
 
 }

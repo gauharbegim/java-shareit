@@ -220,31 +220,50 @@ public class BookingServiceImpl implements BookingService {
 
     public List<BookingDto> ownerItemsBookingLists(String state, Integer userId, Integer from, Integer size) {
         List<Booking> list;
-        Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "start"));
-        switch (state) {
-            case "PAST":
-                list = bookingRepository.findAllByItemOwnerIdAndDateEndBefore(userId, LocalDateTime.now(),
-                        pageable);
-                break;
-            case "FUTURE":
-                list = bookingRepository.findAllByItemOwnerIdAndDateBeginAfter(userId, LocalDateTime.now(),
-                        pageable);
-                break;
-            case "CURRENT":
-                list = bookingRepository.findAllByItemOwnerIdAndDateBeginBeforeAndDateEndAfter(userId,
-                        LocalDateTime.now(), LocalDateTime.now(), pageable);
-                break;
-            case "WAITING":
-                list = bookingRepository.findAllByItemOwnerIdAndStatus(userId, "WAITING", pageable);
-                break;
-            case "REJECTED":
-                list = bookingRepository.findAllByItemOwnerIdAndStatus(userId, "REJECTED", pageable);
-                break;
-            case "ALL":
-                list = bookingRepository.findAllByItemOwnerId(userId, pageable);
-                break;
-            default:
-                throw new BookingUnknownStateException(state);
+        if (from == null && size == null) {
+            Optional<User> user = userRepository.findById(userId);
+            if (user.isPresent()) {
+                List<Booking> listByOwner = bookingRepository.findAllByItemOwnerId(userId);
+                list = getBookingListByStatus(state, listByOwner);
+            } else {
+                throw new UserNotFoundException("Пользователь не найден");
+            }
+        } else if (from >= 0 && size > 0) {
+            Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "dateBegin"));
+            log.info("*****************************************************");
+            switch (state) {
+                case "PAST":
+                    list = bookingRepository.findAllByItemOwnerIdAndDateEndBefore(userId, LocalDateTime.now(),
+                            pageable).getContent();
+                    log.info("lsit: " + list + "  " + "PAST");
+                    break;
+                case "FUTURE":
+                    list = bookingRepository.findAllByItemOwnerIdAndDateBeginAfter(userId, LocalDateTime.now(),
+                            pageable).getContent();
+                    log.info("lsit: " + list + "  " + "FUTURE");
+                    break;
+                case "CURRENT":
+                    list = bookingRepository.findAllByItemOwnerIdAndDateBeginBeforeAndDateEndAfter(userId,
+                            LocalDateTime.now(), LocalDateTime.now(), pageable).getContent();
+                    break;
+                case "WAITING":
+                    list = bookingRepository.findAllByItemOwnerIdAndStatus(userId, "WAITING", pageable).getContent();
+                    log.info("lsit: " + list + "  " + "WAITING");
+                    break;
+                case "REJECTED":
+                    list = bookingRepository.findAllByItemOwnerIdAndStatus(userId, "REJECTED", pageable).getContent();
+                    log.info("lsit: " + list + "  " + "REJECTED");
+                    break;
+                case "ALL":
+                    list = bookingRepository.findAllByItemOwnerId(userId, pageable).getContent();
+                    log.info("lsit: " + list + "  " + "ALL");
+                    break;
+                default:
+                    throw new BookingUnknownStateException(state);
+            }
+            log.info("*****************************************************");
+        } else {
+            throw new IncorrectBookingParameterException("Неверные параметры");
         }
         return list.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
     }
