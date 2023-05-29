@@ -13,6 +13,7 @@ import java.util.List;
 @Repository
 public interface ItemRequestRepository extends JpaRepository<ItemRequest, Integer> {
     List<ItemRequest> findByRequestor(User user);
+
     Page<ItemRequest> findAllByRequestorIdNot(Integer userId, Pageable page);
 
 //    @Query(nativeQuery = true, value = "SELECT * from (SELECT b.*, ROWNUM() r FROM (SELECT b.* FROM REQUESTS b WHERE b.USER_ID<>:user ORDER BY DATE_CREATE DESC ) b ) " +
