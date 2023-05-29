@@ -192,28 +192,61 @@ public class BookingServiceImpl implements BookingService {
         return list;
     }
 
-    @Override
-    public List<BookingDto> ownerItemsBookingLists(String state, Integer ownerId, Integer from, Integer size) {
-        Optional<User> user = userRepository.findById(ownerId);
-        if (user.isPresent()) {
-            List<Item> ownerItemList = itemRepository.findByOwner(user.get());
-            List<Booking> bookingList = new ArrayList<>();
-            ownerItemList.forEach(item -> {
-                        List<Booking> itemBookingList = new ArrayList<>();
-                        if (from == null && size == null) {
-                            itemBookingList = bookingRepository.findByItem(item);
-                        } else if (from >= 0 && size > 0) {
-                            itemBookingList = bookingRepository.findByItemByLimits(item.getId(), from, size);
-                        } else {
-                            throw new IncorrectBookingParameterException("Неверные параметры");
-                        }
-                        bookingList.addAll(itemBookingList);
-                    }
-            );
-            List<Booking> list = getBookingListByStatus(state, bookingList);
-            return BookingMapper.toBookingDtoList(list);
-        } else {
-            throw new UserNotFoundException("Пользователь не найден");
+//    @Override
+//    public List<BookingDto> ownerItemsBookingLists(String state, Integer ownerId, Integer from, Integer size) {
+//        Optional<User> user = userRepository.findById(ownerId);
+//        if (user.isPresent()) {
+//            List<Item> ownerItemList = itemRepository.findByOwner(user.get());
+//            List<Booking> bookingList = new ArrayList<>();
+//            ownerItemList.forEach(item -> {
+//                        List<Booking> itemBookingList = new ArrayList<>();
+//                        if (from == null && size == null) {
+//                            itemBookingList = bookingRepository.findByItem(item);
+//                        } else if (from >= 0 && size > 0) {
+//                            itemBookingList = bookingRepository.findByItemByLimits(item.getId(), from, size);
+//                        } else {
+//                            throw new IncorrectBookingParameterException("Неверные параметры");
+//                        }
+//                        bookingList.addAll(itemBookingList);
+//                    }
+//            );
+//            List<Booking> list = getBookingListByStatus(state, bookingList);
+//            return BookingMapper.toBookingDtoList(list);
+//        } else {
+//            throw new UserNotFoundException("Пользователь не найден");
+//        }
+//    }
+//
+
+    public List<BookingDto> ownerItemsBookingLists(String state, Integer userId, Integer from, Integer size) {
+        List<Booking> list;
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "start"));
+        switch (state) {
+            case "PAST":
+                list = bookingRepository.findAllByItemOwnerIdAndDateEndBefore(userId, LocalDateTime.now(),
+                        pageable);
+                break;
+            case "FUTURE":
+                list = bookingRepository.findAllByItemOwnerIdAndDateBeginAfter(userId, LocalDateTime.now(),
+                        pageable);
+                break;
+            case "CURRENT":
+                list = bookingRepository.findAllByItemOwnerIdAndDateBeginBeforeAndDateEndAfter(userId,
+                        LocalDateTime.now(), LocalDateTime.now(), pageable);
+                break;
+            case "WAITING":
+                list = bookingRepository.findAllByItemOwnerIdAndStatus(userId, "WAITING", pageable);
+                break;
+            case "REJECTED":
+                list = bookingRepository.findAllByItemOwnerIdAndStatus(userId, "REJECTED", pageable);
+                break;
+            case "ALL":
+                list = bookingRepository.findAllByItemOwnerId(userId, pageable);
+                break;
+            default:
+                throw new BookingUnknownStateException(state);
         }
+        return list.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
     }
+
 }

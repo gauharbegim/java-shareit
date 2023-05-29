@@ -10,6 +10,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -30,4 +31,16 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findByItemByLimits(@Param("item") Integer item, @Param("from") Integer from, @Param("size") Integer size);
 
     List<Booking> findByItemAndBooker(Item item, User user);
+
+    List<Booking> findAllByItemOwnerId(Integer userId, Pageable pageable);
+
+    List<Booking> findAllByItemOwnerIdAndDateBeginBeforeAndDateEndAfter(Integer userId, LocalDateTime t1, LocalDateTime t2,
+                                                                        Pageable pageable);
+
+    List<Booking> findAllByItemOwnerIdAndDateEndBefore(Integer userId, LocalDateTime now, Pageable pageable);
+
+    List<Booking> findAllByItemOwnerIdAndDateBeginAfter(Integer userId, LocalDateTime now, Pageable pageable);
+
+    List<Booking> findAllByItemOwnerIdAndStatus(Integer userId, String waiting, Pageable pageable);
+
 }
