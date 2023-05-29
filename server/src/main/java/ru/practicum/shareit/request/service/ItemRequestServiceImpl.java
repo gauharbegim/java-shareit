@@ -85,8 +85,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestDto> getItemRequests(Integer owner, Integer from, Integer size) {
-        log.info("owner: "+owner);
-        log.info("from: "+from);
+        log.info("owner: " + owner);
+        log.info("from: " + from);
         List<ItemRequest> itemRequestList = new ArrayList<>();
         if (from == null || size == null) {
             itemRequestList = requestRepository.findAll();
