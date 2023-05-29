@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository requestRepository;
     private final UserRepository userRepository;
@@ -83,6 +85,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestDto> getItemRequests(Integer owner, Integer from, Integer size) {
+        log.info("owner: "+owner);
+        log.info("from: "+from);
         List<ItemRequest> itemRequestList = new ArrayList<>();
         if (from == null || size == null) {
             itemRequestList = requestRepository.findAll();
@@ -91,7 +95,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             throw new IncorrectPageParametrException("Неверные параметры");
         } else {
             User requestor = getRequestorUser(owner);
-            Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "id"));
+            Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "created"));
             itemRequestList = requestRepository.findAllByRequestor(requestor, pageable).getContent();
             List<ItemRequestDto> itemRequestDtoList = ItemRequestMapper.toItemRequestDtoList(itemRequestList);
             addItems(itemRequestDtoList);

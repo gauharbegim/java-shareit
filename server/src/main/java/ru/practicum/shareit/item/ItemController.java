@@ -40,7 +40,7 @@ public class ItemController {
         return itemService.getItems(text);
     }
 
-    @PostMapping()
+    @PostMapping
     public ItemDto create(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
                           @Valid @RequestBody @NotNull ItemDto item) {
         return itemService.addItem(ownerId, item);

@@ -131,7 +131,7 @@ public class ItemServiceImpl implements ItemService {
         Optional<User> owner = userRepository.findById(ownerId);
         List<Item> itemList;
         if (from != null && size != null && from >= 0 && size > 0) {
-            Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+            Sort sortById = Sort.by(Sort.Direction.ASC, "created");
             Pageable page = PageRequest.of(from, size, sortById);
             Page<Item> itemPage = itemRepository.findByOwner(owner.get(), page);
             itemList = itemPage.getContent();
@@ -143,7 +143,7 @@ public class ItemServiceImpl implements ItemService {
         itemList.forEach(item -> {
             ItemDto itemDto = ItemMapper.toItemDto(item);
             List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
-                    .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
+                    .sorted(Comparator.comparing(Booking::getDateBegin))
                     .collect(Collectors.toList());
             if (itemBookingList.size() > 0) {
                 itemDto.setLastBooking(getLastBooking(item));
