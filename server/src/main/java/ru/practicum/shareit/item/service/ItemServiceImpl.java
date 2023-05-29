@@ -183,7 +183,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getItems(String text) {
         List<Item> list = new ArrayList<>();
-        if (!text.isEmpty()) {
+        if (!text.isBlank()) {
             list = itemRepository.findItemsLike(text.toUpperCase());
         }
         return ItemMapper.toItemDtoList(list);

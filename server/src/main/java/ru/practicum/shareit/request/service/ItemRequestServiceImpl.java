@@ -1,6 +1,9 @@
 package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.exception.IncorrectParameterException;
@@ -88,7 +91,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             throw new IncorrectPageParametrException("Неверные параметры");
         } else {
             User requestor = getRequestorUser(owner);
-            itemRequestList = requestRepository.findByRequestorLimits(requestor.getId(), from, size);
+            Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "id"));
+            itemRequestList = requestRepository.findAllByRequestor(requestor, pageable).getContent();
             List<ItemRequestDto> itemRequestDtoList = ItemRequestMapper.toItemRequestDtoList(itemRequestList);
             addItems(itemRequestDtoList);
             itemRequestDtoList = sortItemRequestList(itemRequestDtoList);
