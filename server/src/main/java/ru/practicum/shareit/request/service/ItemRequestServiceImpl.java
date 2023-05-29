@@ -83,26 +83,18 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return itemRequestDtoList;
     }
 
-    @Override
-    public List<ItemRequestDto> getItemRequests(Integer owner, Integer from, Integer size) {
-        log.info("owner: " + owner);
-        log.info("from: " + from);
-        List<ItemRequest> itemRequestList = new ArrayList<>();
-        if (from == null || size == null) {
-            itemRequestList = requestRepository.findAll();
-            return ItemRequestMapper.toItemRequestDtoList(itemRequestList);
-        } else if (from < 0 || size <= 0) {
-            throw new IncorrectPageParametrException("Неверные параметры");
-        } else {
-            User requestor = getRequestorUser(owner);
-            Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "created"));
-            itemRequestList = requestRepository.findAllByRequestor(requestor, pageable).getContent();
-            List<ItemRequestDto> itemRequestDtoList = ItemRequestMapper.toItemRequestDtoList(itemRequestList);
-            addItems(itemRequestDtoList);
-            itemRequestDtoList = sortItemRequestList(itemRequestDtoList);
-            return itemRequestDtoList;
+    public List<ItemRequestDto> getItemRequests(Integer userId, Integer from, Integer size) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("Не найден пользователь с ИД" + userId);
         }
+        Pageable pageable = PageRequest.of(from / size, size,
+                Sort.by(Sort.Direction.DESC, "created"));
 
+        List<ItemRequest> requests = requestRepository.findAllByRequestorIdNot(userId, pageable).getContent();
+        List<ItemRequestDto> itemRequestDtoList = ItemRequestMapper.toItemRequestDtoList(requests);
+        addItems(itemRequestDtoList);
+        itemRequestDtoList = sortItemRequestList(itemRequestDtoList);
+        return itemRequestDtoList;
     }
 
     private List<ItemRequestDto> sortItemRequestList(List<ItemRequestDto> itemRequestDtoList) {
