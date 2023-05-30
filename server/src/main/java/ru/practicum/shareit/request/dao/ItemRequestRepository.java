@@ -15,10 +15,4 @@ public interface ItemRequestRepository extends JpaRepository<ItemRequest, Intege
     List<ItemRequest> findByRequestor(User user);
 
     Page<ItemRequest> findAllByRequestorIdNot(Integer userId, Pageable page);
-
-//    @Query(nativeQuery = true, value = "SELECT * from (SELECT b.*, ROWNUM() r FROM (SELECT b.* FROM REQUESTS b WHERE b.USER_ID<>:user ORDER BY DATE_CREATE DESC ) b ) " +
-//            "WHERE r>:from and ROWNUM<=:size ORDER BY DATE_CREATE DESC")
-//    List<ItemRequest> findByRequestorLimits(@Param("user") Integer userId, @Param("from") Integer from, @Param("size") Integer size);
-
-    Page<ItemRequest> findAllByRequestor(User requestor, Pageable page);
 }

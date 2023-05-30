@@ -30,7 +30,6 @@ public class BookingController {
     public BookingDto approve(@RequestHeader(value = Variables.USER_ID) Integer ownerId,
                               @PathVariable Integer bookingId,
                               @RequestParam(name = "approved") boolean approved) {
-        log.info("******************************************");
         return bookingService.aprove(ownerId, bookingId, approved);
     }
 

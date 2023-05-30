@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.booking.dto.Variables;
 import ru.practicum.shareit.item.dto.CommentRequestDto;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
 
@@ -21,18 +22,18 @@ public class ItemController {
     private final ItemClient itemClient;
 
     @GetMapping
-    public ResponseEntity<Object> getItems(@RequestHeader("X-Sharer-User-Id") Integer userId) {
+    public ResponseEntity<Object> getItems(@RequestHeader(Variables.USER_ID) Integer userId) {
         return itemClient.getItems(userId);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getItem(@PathVariable Integer id,
-                                          @RequestHeader("X-Sharer-User-Id") Integer userId) {
+                                          @RequestHeader(Variables.USER_ID) Integer userId) {
         return itemClient.getItem(id, userId);
     }
 
     @PostMapping
-    public ResponseEntity<Object> createItem(@RequestHeader("X-Sharer-User-Id") Integer userId,
+    public ResponseEntity<Object> createItem(@RequestHeader(Variables.USER_ID) Integer userId,
                                              @RequestBody @Valid ItemRequestDto requestDto) {
         return itemClient.createItem(userId, requestDto);
     }
@@ -40,7 +41,7 @@ public class ItemController {
     @PatchMapping("/{id}")
     public ResponseEntity<Object> updateItem(@RequestBody ItemRequestDto requestDto,
                                              @PathVariable Integer id,
-                                             @RequestHeader("X-Sharer-User-Id") Integer userId) {
+                                             @RequestHeader(Variables.USER_ID) Integer userId) {
         return itemClient.updateItem(requestDto, id, userId);
     }
 
@@ -51,7 +52,7 @@ public class ItemController {
 
     @GetMapping("/search")
     public ResponseEntity<Object> searchItem(@RequestParam String text,
-                                             @RequestHeader("X-Sharer-User-Id") Integer userId) {
+                                             @RequestHeader(Variables.USER_ID) Integer userId) {
         if (text.isBlank()) {
             return ResponseEntity.ok(Collections.emptyList());
         }
@@ -59,7 +60,7 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<Object> createComment(@PathVariable Integer itemId, @RequestHeader("X-Sharer-User-Id") Integer userId,
+    public ResponseEntity<Object> createComment(@PathVariable Integer itemId, @RequestHeader(Variables.USER_ID) Integer userId,
                                                 @Valid @RequestBody CommentRequestDto requestDto) {
         return itemClient.createComment(itemId, userId, requestDto);
     }

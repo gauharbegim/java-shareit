@@ -87,7 +87,6 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto aprove(Integer ownerId, Integer bookingId, boolean approved) {
         Optional<Booking> bookingOption = bookingRepository.findById(bookingId);
         if (bookingOption.isPresent()) {
-            log.info("booking: " + bookingOption.get());
             Item item = bookingOption.get().getItem();
             User owner = item.getOwner();
             if (owner.getId().equals(ownerId)) {
@@ -146,7 +145,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private List<Booking> getBookingListByStatus(String state, List<Booking> bookingList) {
-        log.info("+++++" + state + "+++++");
         List<Booking> list = new ArrayList<>();
         switch (state) {
             case "PAST":
@@ -192,32 +190,6 @@ public class BookingServiceImpl implements BookingService {
         return list;
     }
 
-//    @Override
-//    public List<BookingDto> ownerItemsBookingLists(String state, Integer ownerId, Integer from, Integer size) {
-//        Optional<User> user = userRepository.findById(ownerId);
-//        if (user.isPresent()) {
-//            List<Item> ownerItemList = itemRepository.findByOwner(user.get());
-//            List<Booking> bookingList = new ArrayList<>();
-//            ownerItemList.forEach(item -> {
-//                        List<Booking> itemBookingList = new ArrayList<>();
-//                        if (from == null && size == null) {
-//                            itemBookingList = bookingRepository.findByItem(item);
-//                        } else if (from >= 0 && size > 0) {
-//                            itemBookingList = bookingRepository.findByItemByLimits(item.getId(), from, size);
-//                        } else {
-//                            throw new IncorrectBookingParameterException("Неверные параметры");
-//                        }
-//                        bookingList.addAll(itemBookingList);
-//                    }
-//            );
-//            List<Booking> list = getBookingListByStatus(state, bookingList);
-//            return BookingMapper.toBookingDtoList(list);
-//        } else {
-//            throw new UserNotFoundException("Пользователь не найден");
-//        }
-//    }
-//
-
     public List<BookingDto> ownerItemsBookingLists(String state, Integer userId, Integer from, Integer size) {
         List<Booking> list;
         if (from == null && size == null) {
@@ -230,17 +202,14 @@ public class BookingServiceImpl implements BookingService {
             }
         } else if (from >= 0 && size > 0) {
             Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "dateBegin"));
-            log.info("*****************************************************");
             switch (state) {
                 case "PAST":
                     list = bookingRepository.findAllByItemOwnerIdAndDateEndBefore(userId, LocalDateTime.now(),
                             pageable).getContent();
-                    log.info("lsit: " + list + "  " + "PAST");
                     break;
                 case "FUTURE":
                     list = bookingRepository.findAllByItemOwnerIdAndDateBeginAfter(userId, LocalDateTime.now(),
                             pageable).getContent();
-                    log.info("lsit: " + list + "  " + "FUTURE");
                     break;
                 case "CURRENT":
                     list = bookingRepository.findAllByItemOwnerIdAndDateBeginBeforeAndDateEndAfter(userId,
@@ -248,24 +217,22 @@ public class BookingServiceImpl implements BookingService {
                     break;
                 case "WAITING":
                     list = bookingRepository.findAllByItemOwnerIdAndStatus(userId, "WAITING", pageable).getContent();
-                    log.info("lsit: " + list + "  " + "WAITING");
                     break;
                 case "REJECTED":
                     list = bookingRepository.findAllByItemOwnerIdAndStatus(userId, "REJECTED", pageable).getContent();
-                    log.info("lsit: " + list + "  " + "REJECTED");
                     break;
                 case "ALL":
                     list = bookingRepository.findAllByItemOwnerId(userId, pageable).getContent();
-                    log.info("lsit: " + list + "  " + "ALL");
                     break;
                 default:
                     throw new BookingUnknownStateException(state);
             }
-            log.info("*****************************************************");
         } else {
             throw new IncorrectBookingParameterException("Неверные параметры");
         }
-        return list.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
+        return list.stream()
+                .map(BookingMapper::toBookingDto)
+                .collect(Collectors.toList());
     }
 
 }

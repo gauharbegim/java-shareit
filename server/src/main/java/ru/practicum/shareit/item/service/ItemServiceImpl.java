@@ -138,47 +138,15 @@ public class ItemServiceImpl implements ItemService {
             itemDtoList.add(itemDto);
         });
 
-        List<Integer> idItems = itemDtoList.stream().map(ItemDto::getId).collect(Collectors.toList());
-//        Map<Long, List<CommentDto>> comments = commentRepository.findByItemIdIn(idItems, Sort.by(DESC, "created"))
-//                .stream()
-//                .map(CommentMapper::toCommentDto)
-//                .collect(Collectors.groupingBy(CommentDto::getId));
-//        itemDtoList.forEach(i -> i.setComments(comments.get(i.getId())));
         itemDtoList.sort(Comparator.comparing(ItemDto::getId));
 
         return itemDtoList;
     }
 
-
-//        @Override
-//    public List<ItemDto> getItems(Integer ownerId) {
-//        List<Item> itemList;
-//        Optional<User> owner = userRepository.findById(ownerId);
-//        if (owner.isPresent()) {
-//            itemList = itemRepository.findByOwner(owner.get());
-//        } else {
-//            throw new UserNotFoundException("Пользователь не найден");
-//        }
-//        List<ItemDto> itemDtoList = new ArrayList<>();
-//        itemList.forEach(item -> {
-//            ItemDto itemDto = ItemMapper.toItemDto(item);
-//            List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
-//                    .sorted(Comparator.comparing(Booking::getDateBegin).reversed())
-//                    .collect(Collectors.toList());
-//            if (itemBookingList.size() > 0) {
-//                itemDto.setLastBooking(getLastBooking(item));
-//                itemDto.setNextBooking(getNextBooking(itemBookingList));
-//            }
-//            itemDtoList.add(itemDto);
-//        });
-//        return itemDtoList;
-//    }
-
     private BookingDto getLastBooking(Item item) {
         List<Booking> itemBookingList = bookingRepository.findByItem(item).stream()
                 .filter(booking -> (booking.getDateEnd().isBefore(LocalDateTime.now().plusDays(1))))
                 .filter(booking -> booking.getStatus().equals("APPROVED"))
-//                .sorted((a, b) -> Math.toIntExact(b.getDateBegin().getSecond() - a.getDateBegin().getSecond()))
                 .sorted(Comparator.comparing(Booking::getDateBegin))
                 .collect(Collectors.toList());
         if (itemBookingList.size() > 0) {
