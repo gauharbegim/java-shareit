@@ -7,8 +7,6 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.utilits.Variables;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -22,7 +20,7 @@ public class BookingController {
 
     @PostMapping
     public BookingDto booking(@RequestHeader(value = Variables.USER_ID) Integer bookerId,
-                              @Valid @RequestBody @NotNull BookingDto bookingDto) {
+                              @RequestBody BookingDto bookingDto) {
         return bookingService.booking(bookerId, bookingDto);
     }
 

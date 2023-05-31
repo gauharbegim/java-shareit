@@ -11,7 +11,6 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.Variables;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 @Controller
 @RequestMapping(path = "/bookings")
@@ -24,7 +23,7 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<Object> booking(@RequestHeader(value = Variables.USER_ID) Integer userId,
-                                          @Valid @RequestBody @NotNull BookingDto bookingDto) {
+                                          @Valid @RequestBody BookingDto bookingDto) {
         return bookingClient.addBooking(userId, bookingDto);
     }
 
